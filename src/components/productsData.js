@@ -1,0 +1,76 @@
+// productsData.js
+
+const ALL_PRODUCTS = [
+    {
+        id: 1,
+        title: "The Wedding People",
+        author: "Ap Bokifa",
+        price: 299.95,
+        rating: 3,
+        reviewCount: 3,
+        discount: 15,
+        imageUrl: "/src/assets/the_wedding.webp",
+    },
+    {
+        id: 2,
+        title: "Redemption Echo",
+        author: "Ap Bokifa",
+        price: 249.95,
+        rating: 0,
+        reviewCount: 0,
+        imageUrl: "/src/assets/RedemptionEcho.webp",
+    },
+    {
+        id: 3,
+        title: "The Mighty Red",
+        author: "Ap Bokifa",
+        price: 279.95,
+        rating: 1,
+        reviewCount: 1,
+        discount: 15,
+        imageUrl: "/src/assets/TheMightyRed.webp",
+    },
+    {
+        id: 4,
+        title: "James by Percival Everett",
+        author: "Ap Bokifa",
+        price: 299.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 15,
+        imageUrl: "/src/assets/James.webp",
+    },
+    {
+        id: 5,
+        title: "A Sorceress Comes to Call",
+        author: "Ap Bokifa",
+        price: 319.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 15,
+        imageUrl: "/src/assets/ASorcerresComesToCall.webp",
+    },
+    {
+        id: 6,
+        title: "The Last Thing He Told Me",
+        author: "Ap Bokifa",
+        price: 29.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 15,
+        imageUrl: "/src/assets/TheLastThingHeToldME.webp",
+    },
+    {
+        id: 7,
+        title: "Another Great Book",
+        discount: 15,
+        author: "Ap Bokifa",
+        price: 199.99,
+        rating: 4,
+        reviewCount: 120,
+        imageUrl: "/src/assets/AnotherGreatBook.webp",
+    },
+];
+
+// Export the full list as the default export
+export default ALL_PRODUCTS;

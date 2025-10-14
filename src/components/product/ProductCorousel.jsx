@@ -1,30 +1,47 @@
 // ProductCarousel.js
 
-import React, { useRef } from "react";
-// FIX 1: Assuming ProductCard is available in the current directory or specified in the file list.
-import ProductCard from "./ProductCard";
-import ALL_PRODUCTS from "../productsData";
+import React from "react";
+import Slider from "react-slick";
+import ProductCard from "./ProductCard"; // Assuming this path is correct
+import ALL_PRODUCTS from "../productsData"; // Assuming this path is correct
+
+// Import react-slick styles
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { s } from "framer-motion/client";
+
 // Reusable ProductCarousel component
 const ProductCarousel = ({ title, productIds }) => {
-    const scrollContainerRef = useRef(null);
-
-    // Filter ALL_PRODUCTS based on the passed IDs (Option C logic)
+    // Filter ALL_PRODUCTS based on the passed IDs
     const products = productIds
         ? ALL_PRODUCTS.filter((p) => productIds.includes(p.id))
         : ALL_PRODUCTS;
 
-    const scroll = (direction) => {
-        if (scrollContainerRef.current) {
-            // Scrolling by a percentage of the container width ensures responsiveness.
-            const scrollWidth = scrollContainerRef.current.offsetWidth;
-            const scrollAmount =
-                direction === "left" ? -scrollWidth : scrollWidth;
-
-            scrollContainerRef.current.scrollBy({
-                left: scrollAmount / 2, // Scroll half a screen width for better viewing
-                behavior: "smooth",
-            });
-        }
+    // Configuration settings for the react-slick carousel
+    const sliderSettings = {
+        dots: false,
+        infinite: false, // Only be infinite if there are more products than can be shown
+        speed: 500,
+        arrows: false, // Show the default navigation arrows
+        slidesToShow: 6, // Default for desktop (screens >= 1200px)
+        slidesToScroll: 1,
+        swipeToSlide: true,
+        responsive: [
+            {
+                // Custom breakpoint: screens < 1200px, show 2 large cards
+                breakpoint: 1200,
+                settings: {
+                    slidesToShow: 2,
+                },
+            },
+            {
+                // Custom breakpoint: screens < 575px, show 1 large card
+                breakpoint: 575,
+                settings: {
+                    slidesToShow: 1,
+                },
+            },
+        ],
     };
 
     return (
@@ -35,16 +52,16 @@ const ProductCarousel = ({ title, productIds }) => {
                     <a
                         href="#"
                         className="
-                            inline-flex items-center  
+                            inline-flex items-center
                             justify-center
-                            px-6 py-3  
-                            rounded-full  
-                            bg-white shadow-lg  
+                            px-6 py-3
+                            rounded-full
+                            bg-white shadow-lg
                             text-base font-semibold text-gray-900
-                            whitespace-nowrap 
-                            transition-all duration-300 
-                            hover:bg-gray-900  
-                            hover:text-white  
+                            whitespace-nowrap
+                            transition-all duration-300
+                            hover:bg-gray-900
+                            hover:text-white
                             hover:shadow-xl
                         "
                     >
@@ -54,35 +71,19 @@ const ProductCarousel = ({ title, productIds }) => {
                 </div>
             </div>
 
-            {/* Carousel Content */}
+            {/* Carousel Content - REPLACED WITH REACT-SLICK */}
             <div className="relative">
-                
-                <div
-                    ref={scrollContainerRef}
-                    // Added gap-4 for spacing between cards and ensured scrollbar-hide works
-                    className="flex overflow-x-auto pb-4 -mb-4 scrollbar-hide gap-4"
-                    style={{ scrollSnapType: "none" }}
-                >
+                <Slider {...sliderSettings}>
                     {products.map((product) => (
-                        <div
-                            key={product.id}
-                            // *** RESPONSIVE WIDTH CLASSES IMPLEMENTED ***
-                            className="
-                                flex-shrink-0 p-1
-                                w-full                            /* w < 575px (Small/Default): 1 product (100% width) */
-                                sm:w-1/2                          /* sm:w-1/2 (Width < 1200px): 2 products (50% width each) */
-                                lg:w-1/3                          /* Added an intermediate step for tablets */
-                                xl:w-[calc(100%/6)]               /* xl:w-1/6 (Full Width > 1280px): 6 products (approx 16.66% each) */
-                                scroll-snap-align-start
-                            "
-                        >
-                            {/* Use the imported ProductCard */}
+                        <div key={product.id} className="p-2">
+                            {/* The padding creates the 'gap' between slides */}
                             <ProductCard product={product} />
                         </div>
                     ))}
-                </div>
+                </Slider>
             </div>
         </div>
     );
 };
+
 export default ProductCarousel;

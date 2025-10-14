@@ -61,6 +61,13 @@ const ProductCard = ({ product }) => {
                         </span>
                     </div>
                 )}
+                {product.isSoldOut && (
+                    <div className="absolute top-3 left-3 bg-gray-600 text-white text-base font-bold rounded-full w-10 h-10 flex items-center justify-center z-10">
+                        <span className="text-xs  text-center font-semibold">
+                            Sold Out
+                        </span>
+                    </div>
+                )}
 
                 {/* Icon Bar: Quick View and Compare appear on card hover. */}
                 <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-10">
@@ -168,14 +175,26 @@ const ProductCard = ({ product }) => {
                     {product.author}
                 </a>
 
-                <p className="text-2xl font-bold text-green-700 mt-3">
+                <p
+                    className={
+                        product.isSoldOut
+                            ? "text-2xl font-bold text-gray-500 mt-3 "
+                            : "text-2xl font-bold text-green-700 mt-3"
+                    }
+                >
                     ${product.price}
                 </p>
             </div>
 
             {/* Add to Cart button slides up */}
             <div className="p-3 pt-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out transform -translate-y-24 group-hover:translate-y-0">
-                <button className="w-full bg-green-700 text-white font-bold py-2.5 px-4 rounded-full flex items-center justify-center hover:bg-green-800 transition-colors text-sm">
+                <button
+                    className={
+                        product.isSoldOut
+                            ? "w-full bg-gray-300 text-gray-500 font-bold py-2.5 px-4 rounded-full flex items-center justify-center cursor-not-allowed text-sm"
+                            : "w-full bg-green-700 text-white font-bold py-2.5 px-4 rounded-full flex items-center justify-center hover:bg-green-800 transition-colors text-sm"
+                    }
+                >
                     {/* The SVG path for the Add to Cart button matches the image */}
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -185,13 +204,22 @@ const ProductCard = ({ product }) => {
                         stroke="currentColor"
                         strokeWidth={2}
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                        />
+                        {/* Note: It's also a good idea to conditionally hide the plus icon when sold out */}
+                        {product.isSoldOut ? (
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6 18L18 6M6 6l12 12"
+                            />
+                        ) : (
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                            />
+                        )}
                     </svg>
-                    Add To Cart
+                    {product.isSoldOut ? "Sold Out" : "Add To Cart"}
                 </button>
             </div>
         </div>

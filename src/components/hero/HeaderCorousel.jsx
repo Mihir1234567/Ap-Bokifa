@@ -220,7 +220,7 @@ export const HeaderCorousel = () => {
                 })}
             </div>
 
-            <style jsx global>{`
+            <style>{`
                 @keyframes rotate360 {
                     from {
                         transform: rotate(0deg);

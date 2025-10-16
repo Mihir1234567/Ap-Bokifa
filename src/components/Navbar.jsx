@@ -219,17 +219,8 @@ const NavDropdown = ({ title, items, menuClass }) => {
                     </div>
 
                     <div className="ml-auto w-[550px] h-[300px] flex-shrink-0">
-                        <div className="bg-gradient-to-r from-[#1D4A34] to-[#3AB757] p-8 rounded-lg text-white h-full flex relative overflow-hidden">
-                            <div className="w-1/3 flex items-center justify-start py-4 pr-4">
-                                <img
-                                    src={
-                                        promo.imageSrc ||
-                                        "https://via.placeholder.com/180x270/28744b/ffffff?text=Book+Cover"
-                                    }
-                                    alt="Book Cover"
-                                    className="object-contain shadow-2xl"
-                                />
-                            </div>
+                        <div className="bg-gradient-to-r from-[#1D4A34] to-[#3AB757] p-8 rounded-lg text-white h-full flex relative overflow-hidden bg-[url('/src/assets/WomenInTheWater.webp')] bg-cover bg-center">
+                            <div className="w-1/3 flex items-center justify-start py-4 pr-4"></div>
 
                             <div className="w-3/5 flex flex-col justify-center text-right pl-4">
                                 <p className="text-md mb-2 text-white/80">

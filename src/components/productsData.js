@@ -5,6 +5,7 @@ const ALL_PRODUCTS = [
         id: 1,
         title: "The Wedding People",
         author: "ALICE HOFFMAN",
+        description: "",
         price: 299.95,
         rating: 0,
         reviewCount: 0,
@@ -12,13 +13,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/the_wedding.webp",
         currentBestselling: false,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 2,
         title: "Redemption Echo",
         author: "CATHY MCINTOSH",
+        description: "",
         price: 249.95,
         rating: 0,
         reviewCount: 0,
@@ -26,13 +29,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/RedemptionEcho.webp",
         currentBestselling: false,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // Set to true from image_654a20.jpg
     },
     {
         id: 3,
         title: "The Mighty Red",
         author: "LOUISE ERDRICH",
+        description: "",
         price: 279.95,
         rating: 1,
         reviewCount: 1,
@@ -40,13 +45,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/TheMightyRed.webp",
         currentBestselling: false,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 4,
         title: "James by Percival Everett",
         author: "PERCIVAL EVERETT",
+        description: "",
         price: 299.95,
         rating: 0,
         reviewCount: 0,
@@ -54,13 +61,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/James.webp",
         currentBestselling: false,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 5,
         title: "A Sorceress Comes to Call",
         author: "T. KINGFISHER",
+        description: "",
         price: 319.95,
         rating: 0,
         reviewCount: 0,
@@ -68,13 +77,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/ASorcerresComesToCall.webp",
         currentBestselling: false,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 6,
         title: "The Last Thing He Told Me",
         author: "Laura Dave",
+        description: "",
         price: 35.24, // $29.95 displayed
         rating: 0,
         reviewCount: 0,
@@ -82,13 +93,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/TheLastThingHeToldME.webp",
         currentBestselling: false,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 7,
         title: "Another Great Book",
         author: "Ap Bokifa",
+        description: "",
         price: 199.99,
         rating: 4,
         reviewCount: 120,
@@ -96,14 +109,16 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/AnotherGreatBook.webp",
         currentBestselling: false,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
-    // --- Current Bestselling Products (Retained/Standardized) ---
+    // --- Current Bestselling Products ---
     {
         id: 8,
         title: "THE HOUSEMAID",
         author: "FREIDA MCFADDEN",
+        description: "",
         price: 35.24,
         rating: 0,
         reviewCount: 0,
@@ -111,13 +126,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/HouseMaid.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 9,
         title: "THE ILIAD",
         author: "HOMER (Translated by Emily Wilson)",
+        description: "",
         price: 35.24,
         rating: 0,
         reviewCount: 0,
@@ -125,13 +142,16 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/Iliad.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 10,
         title: "ENTITLEMENT",
         author: "RUMAAN ALAM",
+        description:
+            "From the author of The Longest Ride and The Return comes a novel about the enduring legacy of first love, and the decisions that haunt...",
         price: 35.24,
         rating: 0,
         reviewCount: 0,
@@ -139,13 +159,16 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/ENTITLEMENT.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // Set to true from image_654a20.jpg
+        isFeatured: true,
     },
     {
         id: 11,
         title: "MOUNT SWEET HOME",
         author: "SARAH PINSKER",
+        description: "",
         price: 35.24,
         rating: 0,
         reviewCount: 0,
@@ -153,13 +176,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/MOUNT_SWEET_HOME.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 12,
         title: "ABSOLUTION",
         author: "JEFF VANDERMEER",
+        description: "",
         price: 319.95,
         rating: 0,
         reviewCount: 0,
@@ -167,13 +192,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/ABSOLUTION.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 13,
         title: "YELLOWFACE",
         author: "R. F. KUANG",
+        description: "",
         price: 35.24,
         rating: 1,
         reviewCount: 1,
@@ -181,27 +208,31 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/YELLOWFACE.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 14,
         title: "THE WOMEN",
         author: "KRISTIN HANNAH",
+        description: "",
         price: 35.24, // $29.95 displayed
-        rating: 0, // Updated from image_fde0ff
-        reviewCount: 0, // Updated from image_fde0ff
+        rating: 0,
+        reviewCount: 0,
         discount: 15,
         imageUrl: "/src/assets/THE_WOMEN.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: true, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: true,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 15,
         title: "SO THIRSTY",
         author: "RACHEL HARRISON",
+        description: "",
         price: 35.24,
         rating: 0,
         reviewCount: 0,
@@ -209,13 +240,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/SO_THIRSTY.webp",
         currentBestselling: true,
         isHighlight: true,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 16,
         title: "Playground",
         author: "RICHARD POWERS",
+        description: "",
         price: 35.24, // $29.95 displayed
         rating: 0,
         reviewCount: 0,
@@ -223,13 +256,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/Playground.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: true, // New label from image_fde11c
-        isSoldOut: false, // Standardized label
+        isHalfPrice: true,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 17,
         title: "THE SAINT OF BRIGHT DOORS",
         author: "VAJRA CHANDRASEKERA",
+        description: "",
         price: 35.24,
         rating: 0,
         reviewCount: 0,
@@ -237,14 +272,16 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/THE_SAINT_OF_BRIGHT_DOORS.webp",
         currentBestselling: true,
         isHighlight: false,
-        isHalfPrice: false, // Standardized label
-        isSoldOut: false, // Standardized label
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     // --- New Products Added (from Half price books and others) ---
     {
         id: 18,
         title: "BLACK SHEEP",
         author: "RACHEL HARRISON",
+        description: "",
         price: 349.95,
         rating: 0,
         reviewCount: 0,
@@ -252,13 +289,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/BLACK_SHEEP.webp",
         currentBestselling: false,
         isHighlight: false,
-        isHalfPrice: true, // New label from image_fde11c
+        isHalfPrice: true,
         isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 19,
         title: "THE BOOK SWAP",
         author: "TESSA DİCKERS",
+        description: "",
         price: 359.95,
         rating: 0,
         reviewCount: 0,
@@ -266,13 +305,15 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/THE_BOOK_SWAP.webp",
         currentBestselling: false,
         isHighlight: false,
-        isHalfPrice: true, // New label from image_fde11c
+        isHalfPrice: true,
         isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 20,
         title: "ERASURE",
         author: "PERCIVAL EVERETT",
+        description: "",
         price: 35.24, // $29.95 displayed
         rating: 0,
         reviewCount: 0,
@@ -280,36 +321,138 @@ const ALL_PRODUCTS = [
         imageUrl: "/src/assets/ERASURE.webp",
         currentBestselling: false,
         isHighlight: false,
-        isHalfPrice: true, // New label from image_fde11c
+        isHalfPrice: true,
         isSoldOut: false,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 21,
         title: "BY ANY OTHER NAME",
         author: "JODI PICOULT",
+        description: "",
         price: 239.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
+        discount: 0,
         imageUrl: "/src/assets/BY_ANY_OTHER_NAME.webp",
         currentBestselling: false,
         isHighlight: false,
-        isHalfPrice: true, // New label from image_fde11c
-        isSoldOut: true, // New label from image_fde11c
+        isHalfPrice: true,
+        isSoldOut: true,
+        isPickForYou: false, // New standardized label
     },
     {
         id: 22,
         title: "LOST AND LASSOED",
         author: "LYNNE GRAHAM",
+        description: "",
         price: 259.95,
         rating: 5,
         reviewCount: 1,
-        discount: 0, // No discount tag visible
+        discount: 0,
         imageUrl: "/src/assets/LOST_AND_LASSOED.webp",
         currentBestselling: false,
         isHighlight: false,
-        isHalfPrice: true, // New label from image_fde11c
+        isHalfPrice: true,
         isSoldOut: false,
+        isPickForYou: false, // New standardized label
+    },
+    // --- New Products Added from 'image_654a20.jpg' (Pick for you) ---
+    {
+        id: 23,
+        title: "Harry Potter And The Sorcerer's Stone",
+        author: "Ap Bokifa", // Placeholder
+        description: "",
+        price: 269.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 0, // No discount tag visible
+        imageUrl: "/src/assets/harry.webp", // Placeholder path
+        currentBestselling: false,
+        isHighlight: false,
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: true,
+    },
+    {
+        id: 24,
+        title: "Memoirs Of A Geisha",
+        author: "ANDY WEIR", // Author from cover
+        description: "",
+        price: 289.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 0, // No discount tag visible
+        imageUrl: "/src/assets/memoirs_of_a_geisha.webp", // Placeholder path
+        currentBestselling: false,
+        isHighlight: false,
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: true,
+    },
+    {
+        id: 25,
+        title: "Scattershot: Life, Music, Elton, and Me",
+        author: "Ap Bokifa", // Placeholder
+        description: "",
+        price: 309.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 0, // No discount tag visible
+        imageUrl: "/src/assets/Scattershot.webp", // Placeholder path
+        currentBestselling: false,
+        isHighlight: false,
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: true,
+    },
+    {
+        id: 26,
+        title: "The Catcher In The Rye",
+        author: "Ap Bokifa", // Placeholder
+        description: "",
+        price: 329.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 0, // No discount tag visible
+        imageUrl: "/src/assets/The_Catcher_In_The_Rye.webp", // Placeholder path
+        currentBestselling: false,
+        isHighlight: false,
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: true,
+    },
+    {
+        id: 27,
+        title: "The City And Its Uncertain Walls: A Novel",
+        author: "Ap Bokifa", // Placeholder
+        description: "",
+        price: 339.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 0, // No discount tag visible
+        imageUrl: "/src/assets/The_City_And_Its_Uncertain_Walls.webp", // Placeholder path
+        currentBestselling: false,
+        isHighlight: false,
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: true,
+    },
+    {
+        id: 28,
+        title: "The House Of The Spirits",
+        author: "CARL MATT DINNIMAN", // Author from cover (Dungeon Crawler)
+        description: "",
+        price: 29.95,
+        rating: 0,
+        reviewCount: 0,
+        discount: 0, // No discount tag visible
+        imageUrl: "/src/assets/The_House_Of_The_Spirits.webp", // Placeholder path
+        currentBestselling: false,
+        isHighlight: false,
+        isHalfPrice: false,
+        isSoldOut: false,
+        isPickForYou: true,
     },
 ];
 

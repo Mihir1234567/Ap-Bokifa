@@ -7,6 +7,10 @@ import { Categories } from "../components/product/Categories";
 import ALL_PRODUCTS from "../components/productsData";
 import ThrillerBanner from "../components/product/ThrillerBanner";
 import { BannerGrid } from "../components/product/BannerGrid";
+import {PicksForYouSection} from "../components/product/PicksForYouSection"
+import FeaturedAuthors from "../components/product/AuthorsCorousel";
+import { ClintTestemonialSection } from "../components/product/ClintTestemonialSection";
+
 const Home = () => {
     const BestSellingIds = ALL_PRODUCTS.filter(
         (product) => product.currentBestselling
@@ -20,11 +24,22 @@ const Home = () => {
         (product) => product.isHalfPrice
     ).map((product) => product.id);
 
+    const smallBooks = ALL_PRODUCTS.filter(
+        (product) => product.isPickForYou
+    ).map((product) => product.id);
+    
+    const featuredBook = ALL_PRODUCTS.filter(
+        (product) => product.isFeatured
+    ).map((product) => product.id);
+
     return (
         <main className="flex-grow">
             <HeaderCorousel />
             <StatMarquee />
-            <ProductCarousel title="This week's highlights" productIds={isHighlightIds} />
+            <ProductCarousel
+                title="This week's highlights"
+                productIds={isHighlightIds}
+            />
             <Categories></Categories>
             <ProductCarousel
                 title="Current Bestsellers"
@@ -36,6 +51,12 @@ const Home = () => {
                 productIds={HalfPriced}
             />
             <BannerGrid />
+            <PicksForYouSection
+                featuredBooks={featuredBook}
+                smallBook={smallBooks}
+            />
+            <FeaturedAuthors></FeaturedAuthors>
+            <ClintTestemonialSection />
             <Footer />
         </main>
     );

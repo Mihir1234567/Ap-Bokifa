@@ -162,7 +162,7 @@ export const ClintTestemonialSection = () => {
 
     return (
         // 1. Outer container: Full width, no horizontal padding here.
-        <div className="min-h-screen bg-white overflow-hidden pt-30 font-sans py-16 relative">
+        <div className="min-h-screen bg-white overflow-hidden pt-30  font-sans py-16 relative">
             {/* 2. Inner Content Wrapper: Used for content that *should* be constrained (Title, Rating Circle) */}
             <div className={`w-full mx-auto  ${containerPadding}`}>
                 {/* Title (Uses the padding utility) */}

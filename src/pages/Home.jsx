@@ -7,15 +7,18 @@ import { Categories } from "../components/product/Categories";
 import ALL_PRODUCTS from "../components/productsData";
 import ThrillerBanner from "../components/product/ThrillerBanner";
 import { BannerGrid } from "../components/product/BannerGrid";
-import {PicksForYouSection} from "../components/product/PicksForYouSection"
+import { PicksForYouSection } from "../components/product/PicksForYouSection";
 import FeaturedAuthors from "../components/product/AuthorsCorousel";
 import { ClintTestemonialSection } from "../components/product/ClintTestemonialSection";
+import { Services } from "../components/product/Services";
+import NewsAndEvents from "../components/product/NewsAndEvents";
+import NewsletterSocials from "../components/product/NewsletterSocials";
 
 const Home = () => {
     const BestSellingIds = ALL_PRODUCTS.filter(
         (product) => product.currentBestselling
     ).map((product) => product.id);
-    
+
     const isHighlightIds = ALL_PRODUCTS.filter(
         (product) => product.isHighlight
     ).map((product) => product.id);
@@ -27,7 +30,7 @@ const Home = () => {
     const smallBooks = ALL_PRODUCTS.filter(
         (product) => product.isPickForYou
     ).map((product) => product.id);
-    
+
     const featuredBook = ALL_PRODUCTS.filter(
         (product) => product.isFeatured
     ).map((product) => product.id);
@@ -57,6 +60,9 @@ const Home = () => {
             />
             <FeaturedAuthors></FeaturedAuthors>
             <ClintTestemonialSection />
+            <Services />
+            <NewsAndEvents />
+            <NewsletterSocials />
             <Footer />
         </main>
     );

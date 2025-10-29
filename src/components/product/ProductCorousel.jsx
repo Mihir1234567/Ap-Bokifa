@@ -11,7 +11,8 @@ import "slick-carousel/slick/slick-theme.css";
 import { s } from "framer-motion/client";
 
 // Reusable ProductCarousel component
-const ProductCarousel = ({ title, productIds }) => {
+// 🌟 MODIFICATION 1: Accept the onViewProduct prop
+const ProductCarousel = ({ title, productIds, onViewProduct }) => {
     // Filter ALL_PRODUCTS based on the passed IDs
     const products = productIds
         ? ALL_PRODUCTS.filter((p) => productIds.includes(p.id))
@@ -77,7 +78,11 @@ const ProductCarousel = ({ title, productIds }) => {
                     {products.map((product) => (
                         <div key={product.id} className="p-2">
                             {/* The padding creates the 'gap' between slides */}
-                            <ProductCard product={product} />
+                            {/* 🌟 MODIFICATION 2: Pass onViewProduct to ProductCard */}
+                            <ProductCard
+                                product={product}
+                                onViewProduct={onViewProduct}
+                            />
                         </div>
                     ))}
                 </Slider>

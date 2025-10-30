@@ -143,25 +143,11 @@ const Dropdown = ({ selected, items, onSelect, buttonClass, menuClass }) => {
     );
 };
 
-// --- NavDropdown (Hover-based) ---
-const NavDropdown = ({ title, items, menuClass }) => {
+// --- NavDropdown (Hover-based) - FIXED ---
+const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
     const [isOpen, setIsOpen] = useState(false);
-    const navRef = useRef(null);
-    const [topOffset, setTopOffset] = useState(0);
-
+    const isDesktop = useIsDesktop();
     const isMegaMenu = !Array.isArray(items);
-
-    useEffect(() => {
-        if (isMegaMenu && navRef.current) {
-            const bottomNav = document.querySelector(
-                ".border-t.border-gray-200"
-            );
-            if (bottomNav) {
-                const rect = bottomNav.getBoundingClientRect();
-                setTopOffset(rect.bottom);
-            }
-        }
-    }, [isMegaMenu, isOpen]);
 
     const renderMenuContent = () => {
         if (isMegaMenu) {
@@ -195,7 +181,6 @@ const NavDropdown = ({ title, items, menuClass }) => {
             const columnKeys = Object.keys(items).filter(
                 (key) => key !== "promo"
             );
-            const promo = items.promo || {};
 
             return (
                 <div className="flex justify-start py-6 px-8 gap-16 max-w-screen-2xl mx-auto">
@@ -245,13 +230,11 @@ const NavDropdown = ({ title, items, menuClass }) => {
         if (Array.isArray(items)) {
             return (
                 <>
-                    <div className="h-0.5 bg-[#3AB757]"></div>
-
                     {items.map((item, index) => (
                         <a
                             key={item}
                             href="#"
-                            className={`block px-4 py-3 hover:bg-gray-100 ${
+                            className={`block px-4 py-3 text-gray-800 hover:text-[#3AB757] hover:bg-gray-100 ${
                                 index < items.length - 1
                                     ? "border-b border-gray-200"
                                     : ""
@@ -268,38 +251,45 @@ const NavDropdown = ({ title, items, menuClass }) => {
 
     const dropdownClasses = isMegaMenu
         ? `fixed left-0 right-0 w-full border-b border-gray-200`
-        : `absolute top-full left-0 w-48 border-b border-l border-r border-gray-200`;
+        : `absolute top-full left-0 w-48 border-b border-gray-200`;
+
+    const fixedTopClass = isMegaMenu ? "top-[]" : "";
 
     return (
         <div
             className="relative"
             onMouseEnter={() => setIsOpen(true)}
             onMouseLeave={() => setIsOpen(false)}
-            ref={navRef}
         >
-            <button className="flex items-center py-4 text-gray-800 font-medium hover:text-[#3AB757]">
+            <button
+                className={`flex items-center py-4 text-gray-800 font-medium hover:text-[#3AB757] ${buttonClass}`}
+            >
                 {title} <ChevronDownIcon />
             </button>
-            <AnimatePresence>
-                {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        style={isMegaMenu ? { top: `${topOffset}px` } : {}}
-                        className={`mt-0 bg-white shadow-xl z-10 
-                                    overflow-y-auto max-h-[70vh] ${dropdownClasses} ${menuClass}`}
-                    >
-                        {isMegaMenu ? (
-                            <div className="h-0.5 bg-[#3AB757] w-full"></div>
-                        ) : null}
-                        {renderMenuContent()}
-                    </motion.div>
-                )}
-            </AnimatePresence>
+
+            {isDesktop && (
+                <motion.div
+                    // FIX: Use visibility: 'hidden' for performance on hover
+                    initial={{ opacity: 0, y: -10, visibility: "hidden" }}
+                    animate={{
+                        opacity: isOpen ? 1 : 0,
+                        y: isOpen ? 0 : -10,
+                        visibility: isOpen ? "visible" : "hidden",
+                    }}
+                    transition={{ duration: 0.2 }}
+                    className={`mt-0 bg-white shadow-xl z-10 
+                                overflow-y-auto max-h-[70vh] 
+                                ${dropdownClasses} ${fixedTopClass} ${menuClass}`}
+                >
+                    {/* UNIFIED GREEN BORDER: Apply green border for all dropdowns here */}
+                    <div className="h-0.5 bg-[#3AB757] w-full"></div>
+                    {renderMenuContent()}
+                </motion.div>
+            )}
         </div>
     );
 };
+// --- END NavDropdown FIX ---
 
 // --- NEW COMPONENT: UserDropdown (Hover-based for User Icon) ---
 const UserDropdown = ({ items }) => {
@@ -393,8 +383,6 @@ const MobileNavItem = ({ title, items }) => {
         Object.keys(items).filter((key) => key !== "promo").length > 0;
     const isHomeLayout = !Array.isArray(items) && items && items.layouts;
 
-    const hasNestedItems = isShopLayout || isHomeLayout;
-
     const isSimpleLink = !items || (Array.isArray(items) && items.length === 0);
 
     if (isSimpleLink) {
@@ -485,7 +473,7 @@ const MobileNavItem = ({ title, items }) => {
 };
 // --- END MobileNavItem UPDATE ---
 
-// --- SearchDrawer Component ---
+// --- SearchDrawer Component - FIXED ---
 const SearchDrawer = ({ onClose }) => {
     const isDesktop = useIsDesktop();
 
@@ -495,8 +483,9 @@ const SearchDrawer = ({ onClose }) => {
                 initial={{ x: isDesktop ? "-100%" : "100%" }}
                 animate={{ x: 0 }}
                 exit={{ x: isDesktop ? "-100%" : "100%" }}
-                transition={{ type: "spring", stiffness: 120, damping: 20 }}
-                className="fixed top-0 h-full bg-white shadow-lg z-[100] w-96 max-w-full p-6 flex flex-col right-0 xl:left-0"
+                // ANIMATION FIX: Uses fast tween
+                transition={{ type: "tween", duration: 0.25 }}
+                className="fixed top-0 h-full bg-white shadow-lg z-[10000] w-96 max-w-full p-6 flex flex-col right-0 xl:left-0"
             >
                 <div className="flex justify-between items-center pb-4 border-b">
                     <div className="relative flex-grow">
@@ -507,7 +496,7 @@ const SearchDrawer = ({ onClose }) => {
                             type="text"
                             placeholder="Search our store..."
                             autoFocus
-                            className="w-full pl-10 pr-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#3AB757]"
+                            className="w-full pl-10 pr-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#3AB757]"
                         />
                     </div>
                     <button
@@ -564,12 +553,12 @@ const SearchDrawer = ({ onClose }) => {
                     </div>
                 </div>
             </motion.div>
-            {/* UPDATED: Made the backdrop fainter with bg-opacity-30 */}
+            {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[90]"
+                className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[90] transform"
                 onClick={onClose}
             />
         </>
@@ -707,7 +696,8 @@ const Navbar = () => {
         <>
             {/* Top Banner (kept outside the sticky header so it scrolls away) */}
             {isBannerOpen && (
-                <div className="relative bg-[#1D4A34] text-white text-center py-2 px-4 md:px-8 h-8 flex items-center justify-center">
+                // MODIFIED: bg-[#1D4A34] changed to bg-[#09331a]
+                <div className="relative bg-[#09331a] text-white text-center py-2 px-4 md:px-8 h-8 flex items-center justify-center">
                     <div className="relative flex items-center justify-center w-full max-w-lg mx-auto px-8 py-4">
                         <button
                             className="absolute left-0 top-1/2 -translate-y-1/2 hover:opacity-75 md:-left-8  xl:block"
@@ -738,7 +728,7 @@ const Navbar = () => {
                 </div>
             )}
 
-            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm shadow-sm">
+            <header className="sticky top-0 z-50 bg-white backdrop-blur-sm shadow-sm">
                 {/* Main Navigation */}
                 <div className="py-6">
                     <div className="flex justify-between items-center gap-4 px-4">
@@ -768,29 +758,28 @@ const Navbar = () => {
                                 <Logo />
                             </div>
                         </div>
-
                         {/* CENTER COLUMN: Mobile Logo OR Desktop Search Bar */}
-                        <div className="xl:flex-grow xl:max-w-2xl">
+                        <div className="xl:flex-grow xl:max-w-3xl">
                             {/* Mobile Logo */}
                             <div className="xl:hidden flex-shrink-0">
                                 <Logo />
                             </div>
-                            {/* Desktop Search Bar */}
-                            <div className="hidden xl:flex w-full">
+                            {/* Desktop Search Bar - MODIFIED SECTION */}
+                            <div className="hidden xl:flex w-full  rounded-full  overflow-hidden  shadow-md ">
                                 <input
                                     type="text"
                                     placeholder="Search our store..."
-                                    className="w-full px-4 py-2 text-gray-700 bg-white border border-r-0 border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-[#3AB757] cursor-pointer"
+                                    // MODIFIED: Added padding, removed borders, adjusted background, and made it fully rounded-left
+                                    className="w-full  px-6 py-3  text-gray-700  bg-white   border-0   rounded-l-full   focus:outline-none  cursor-pointer"
                                     onFocus={() => setIsSearchOpen(true)}
                                     readOnly
                                 />
-                                <button className="px-6 py-2 text-white bg-[#1D4A34] rounded-r-md hover:bg-[#275e42] flex items-center gap-2">
+                                <button className=" px-8   py-3  text-white bg-[#027a36]  rounded-full  hover:bg-[#1D4A34] flex items-center gap-2">
                                     <SearchIcon />
                                     Search
                                 </button>
                             </div>
                         </div>
-
                         {/* RIGHT COLUMN: Dropdowns and Icons */}
                         <div className="flex items-center space-x-2 sm:space-x-4">
                             {/* Currency/Language */}
@@ -811,9 +800,7 @@ const Navbar = () => {
                                 />
                             </div>
                             {/* Action Icons */}
-                            {/* UPDATED: Replaced simple <a> with UserDropdown component */}
                             <UserDropdown items={userMenuItems} />
-                            {/* End UserDropdown */}
                             <a
                                 href="#"
                                 className="relative text-gray-600 hover:text-[#1D4A34]"
@@ -840,7 +827,13 @@ const Navbar = () => {
                 <div className="border-t border-gray-200">
                     <div className="max-w-screen-2xl mx-auto px-8 flex justify-between items-center">
                         <nav className="hidden xl:flex space-x-8">
-                            <NavDropdown title="Home" items={homeMegaMenu} />
+                            {/* MODIFIED: Added buttonClass="!text-[#3AB757]" */}
+                            <NavDropdown
+                                title="Home"
+                                items={homeMegaMenu}
+                                buttonClass="!text-[#3AB757]"
+                            />
+
                             <NavDropdown title="Shop" items={shopItems} />
                             <NavDropdown title="Blogs" items={blogItems} />
                             <NavDropdown title="Pages" items={pagesItems} />
@@ -862,89 +855,85 @@ const Navbar = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Mobile Menu (Side Drawer) */}
-                <AnimatePresence>
-                    {isMenuOpen && (
-                        <>
-                            <motion.div
-                                initial={{ x: "-100%" }}
-                                animate={{ x: 0 }}
-                                exit={{ x: "-100%" }}
-                                transition={{ type: "spring", stiffness: 120 }}
-                                className="fixed top-0 left-0 w-80 max-w-full h-full bg-white shadow-lg z-[100] flex flex-col"
-                            >
-                                <div className="p-4 flex justify-end items-center border-b border-gray-200">
-                                    <button
-                                        onClick={() => setIsMenuOpen(false)}
-                                    >
-                                        <XMarkIcon className="h-6 w-6 text-gray-600" />
-                                    </button>
-                                </div>
-                                <div className="p-4 flex-grow overflow-y-auto">
-                                    <MobileNavItem
-                                        title="Home"
-                                        items={homeItems}
-                                    />
-                                    <MobileNavItem
-                                        title="Shop"
-                                        items={shopItems}
-                                    />
-                                    <MobileNavItem
-                                        title="Blogs"
-                                        items={blogItems}
-                                    />
-                                    <MobileNavItem
-                                        title="Pages"
-                                        items={pagesItems}
-                                    />
-                                    <MobileNavItem title="Contact" items={[]} />
-                                    <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
-                                        <Dropdown
-                                            selected={selectedCurrency}
-                                            items={currencies}
-                                            onSelect={setSelectedCurrency}
-                                            buttonClass="text-sm px-0"
-                                            menuClass="w-32"
-                                        />
-                                        <Dropdown
-                                            selected={selectedLanguage}
-                                            items={languages}
-                                            onSelect={setSelectedLanguage}
-                                            buttonClass="text-sm px-0"
-                                            menuClass="w-32"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="p-4 border-t border-gray-200">
-                                    <a
-                                        href="#"
-                                        className="flex items-center space-x-3 text-gray-800 hover:text-[#1D4A34] font-medium"
-                                    >
-                                        <UserIcon className="h-5 w-5" />
-                                        <span>Account</span>
-                                    </a>
-                                </div>
-                            </motion.div>
-                            {/* UPDATED: Made the backdrop fainter with bg-opacity-30 */}
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[90]"
-                                onClick={() => setIsMenuOpen(false)}
-                            />
-                        </>
-                    )}
-                </AnimatePresence>
-
-                {/* Search Drawer */}
-                <AnimatePresence>
-                    {isSearchOpen && (
-                        <SearchDrawer onClose={() => setIsSearchOpen(false)} />
-                    )}
-                </AnimatePresence>
             </header>
+
+            {/* Mobile Menu (Side Drawer) */}
+            <AnimatePresence>
+                {isMenuOpen && (
+                    <>
+                        <motion.div
+                            initial={{ x: "-100%" }}
+                            animate={{ x: 0 }}
+                            exit={{ x: "-100%" }}
+                            // ANIMATION FIX: Uses fast tween
+                            transition={{
+                                type: "tween",
+                                duration: 0.25,
+                            }}
+                            className="fixed top-0 left-0 w-80 max-w-full h-full bg-white shadow-lg z-[1000] flex flex-col"
+                        >
+                            <div className="p-4 flex justify-end items-center border-b border-gray-200">
+                                <button onClick={() => setIsMenuOpen(false)}>
+                                    <XMarkIcon className="h-6 w-6 text-gray-600" />
+                                </button>
+                            </div>
+                            <div className="p-4 flex-grow overflow-y-auto">
+                                <MobileNavItem title="Home" items={homeItems} />
+                                <MobileNavItem title="Shop" items={shopItems} />
+                                <MobileNavItem
+                                    title="Blogs"
+                                    items={blogItems}
+                                />
+                                <MobileNavItem
+                                    title="Pages"
+                                    items={pagesItems}
+                                />
+                                <MobileNavItem title="Contact" items={[]} />
+                                <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
+                                    <Dropdown
+                                        selected={selectedCurrency}
+                                        items={currencies}
+                                        onSelect={setSelectedCurrency}
+                                        buttonClass="text-sm px-0"
+                                        menuClass="w-32"
+                                    />
+                                    <Dropdown
+                                        selected={selectedLanguage}
+                                        items={languages}
+                                        onSelect={setSelectedLanguage}
+                                        buttonClass="text-sm px-0"
+                                        menuClass="w-32"
+                                    />
+                                </div>
+                            </div>
+                            <div className="p-4 border-t border-gray-200">
+                                <a
+                                    href="#"
+                                    className="flex items-center space-x-3 text-gray-800 hover:text-[#1D4A34] font-medium"
+                                >
+                                    <UserIcon className="h-5 w-5" />
+                                    <span>Account</span>
+                                </a>
+                            </div>
+                        </motion.div>
+                        {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[900] transform"
+                            onClick={() => setIsMenuOpen(false)}
+                        />
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* Search Drawer */}
+            <AnimatePresence>
+                {isSearchOpen && (
+                    <SearchDrawer onClose={() => setIsSearchOpen(false)} />
+                )}
+            </AnimatePresence>
         </>
     );
 };

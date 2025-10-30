@@ -1,8 +1,10 @@
-import React from "react";
-import { Heart, Star, ShoppingCart, Eye, GitCompareArrows } from "lucide-react";
+// PicksForYouSection.jsx
+
+import React, { useState } from "react";
+import { Heart, Star, ShoppingCart, Eye } from "lucide-react";
 import ALL_PRODUCTS from "../productsData";
 
-// --- Helper component for displaying star ratings (UNCHANGED) ---
+// --- Helper component for displaying star ratings ---
 const Rating = ({ count }) => (
     <div className="flex items-center text-sm space-x-0.5 text-amber-500">
         {[...Array(5)].map((_, i) => (
@@ -18,11 +20,9 @@ const Rating = ({ count }) => (
 );
 
 // --- Helper component for a small book item ---
-// 🌟 MODIFICATION 1: Accept the onViewProduct prop
 const SmallBookItem = ({ book, onViewProduct }) => (
     <div
         className="flex items-start space-x-3 transition duration-300 p-2 rounded-lg hover:bg-gray-50 cursor-pointer"
-        // 🌟 MODIFICATION 2: Add onClick handler for tracking
         onClick={() => onViewProduct(book)}
     >
         <div className="flex-shrink-0 w-16 h-24 lg:w-20 lg:h-30 overflow-hidden rounded-md shadow-lg">
@@ -52,7 +52,6 @@ const SmallBookItem = ({ book, onViewProduct }) => (
 );
 
 // --- Main Component ---
-// 🌟 MODIFICATION 3: Accept the onViewProduct prop
 export const PicksForYouSection = ({
     featuredBooks,
     smallBook,
@@ -64,6 +63,9 @@ export const PicksForYouSection = ({
     const smallBooks = ALL_PRODUCTS.filter((book) =>
         smallBook.includes(book.id)
     );
+
+    // ADDED STATE for the Wishlist feature
+    const [isWishlisted, setIsWishlisted] = useState(false);
 
     if (!featuredBook || smallBooks.length === 0) {
         return (
@@ -81,7 +83,7 @@ export const PicksForYouSection = ({
                 </h2>
                 <button className="flex items-center text-base font-medium text-green-600 hover:text-green-800 transition">
                     Browse All{" "}
-                    <span className="ml-2 text-xl font-normal">→</span>
+                    <span className="ml-2 text-xl font-normal">›</span>
                 </button>
             </div>
 
@@ -89,15 +91,18 @@ export const PicksForYouSection = ({
                 {/* 1. Large Featured Item */}
                 <div
                     className="bg-white border border-gray-100 rounded-xl shadow-lg p-4 flex flex-col sm:flex-row lg:flex-row space-y-4 sm:space-y-0 sm:space-x-6 lg:col-span-1 lg:h-full transition duration-300 hover:shadow-xl cursor-pointer"
-                    // 🌟 MODIFICATION 4: Add onClick handler for the featured book
                     onClick={() => onViewProduct(featuredBook)}
                 >
                     {/* Image Container - Added 'group' for hover effects */}
                     <div className="group flex-shrink-0 w-full sm:w-1/3 lg:w-72 relative rounded-lg overflow-hidden shadow-2xl">
-                        {/* Discount Tag - CORRECTED TO BE A CLEAN CIRCLE WITHIN IMAGE BOUNDS */}
-                        <div className="absolute top-2 left-2 bg-red-600 text-white text-sm font-extrabold flex items-center justify-center w-12 h-12 rounded-full shadow-md z-10">
-                            <span>- {featuredBook.discount} %</span>
-                        </div>
+                        {/* Discount Tag */}
+                        {featuredBook.discount && (
+                            <div className="absolute top-3 left-3 bg-red-600 text-white text-base font-bold rounded-full w-12 h-12 flex items-center justify-center shadow-md z-10">
+                                <span className="text-sm font-semibold">
+                                    - {featuredBook.discount} %
+                                </span>
+                            </div>
+                        )}
 
                         {/* Book Cover */}
                         <div
@@ -109,54 +114,63 @@ export const PicksForYouSection = ({
                             aria-label={`Cover of ${featuredBook.title}`}
                         ></div>
 
-                        {/* Always visible Heart Icon - Added e.stopPropagation() */}
-                        <div className="absolute top-2 right-2 z-20">
-                            <div className="relative flex items-center group/icon">
-                                <button
-                                    className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-red-500 hover:bg-white transition-colors shadow-md"
-                                    onClick={(e) => e.stopPropagation()} // Prevent tracking click
-                                >
-                                    <Heart
-                                        size={20}
-                                        fill="currentColor"
-                                        stroke="none"
-                                    />
-                                </button>
-                                <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/icon:delay-300">
-                                    Add to Wishlist
-                                </span>
-                            </div>
-                        </div>
+                        {/* Icon Bar consolidated on the right - UPDATED FOR STATE */}
+                        <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-20">
+                            {/* 1. Wishlist Icon (Heart) - PERMANENTLY VISIBLE WITH STATE */}
+                            <button
+                                className="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors shadow-md"
+                                onClick={(e) => {
+                                    e.stopPropagation(); // Prevents card view
+                                    setIsWishlisted(!isWishlisted); // TOGGLE STATE
+                                }}
+                                aria-label={
+                                    isWishlisted
+                                        ? "Remove from wishlist"
+                                        : "Add to wishlist"
+                                }
+                            >
+                                <Heart
+                                    size={20}
+                                    // CONDITIONAL FILL AND COLOR
+                                    fill={
+                                        isWishlisted ? "currentColor" : "none"
+                                    }
+                                    stroke="currentColor"
+                                    className={
+                                        isWishlisted
+                                            ? "text-red-500"
+                                            : "text-gray-700"
+                                    }
+                                />
+                            </button>
 
-                        {/* Hover-only Icons Container - Added e.stopPropagation() to buttons */}
-                        <div className="absolute top-14 right-2 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
-                            {/* Eye Icon (Quick View) */}
-                            <div className="relative flex items-center group/icon">
-                                <button
-                                    className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
-                                    onClick={(e) => e.stopPropagation()} // Prevent tracking click
-                                >
-                                    <Eye size={20} strokeWidth={2} />
-                                </button>
-                                <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/icon:delay-300">
-                                    Quick View
-                                </span>
-                            </div>
+                            {/* Container for Hover-only icons */}
+                            <div className="flex flex-col items-center space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                {/* 2. Eye Icon (Quick View) - CONSISTENT STYLE */}
+                                <div className="relative flex items-center group/icon">
+                                    <button
+                                        className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Eye size={20} strokeWidth={2} />
+                                    </button>
+                                    <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/icon:delay-100">
+                                        Quick View
+                                    </span>
+                                </div>
 
-                            {/* Compare Icon */}
-                            <div className="relative flex items-center group/icon">
-                                <button
-                                    className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-green-600 hover:bg-white transition-colors shadow-md"
-                                    onClick={(e) => e.stopPropagation()} // Prevent tracking click
-                                >
-                                    <GitCompareArrows
-                                        size={20}
-                                        strokeWidth={2}
-                                    />
-                                </button>
-                                <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/icon:delay-300">
-                                    Compare Books
-                                </span>
+                                {/* 3. Compare Icon - CONSISTENT STYLE */}
+                                <div className="relative flex items-center group/icon">
+                                    <button
+                                        className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-green-600 hover:bg-white transition-colors shadow-md"
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <img src="/src/assets/compare.svg" alt="" />
+                                    </button>
+                                    <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/icon:delay-100">
+                                        Compare
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -164,16 +178,10 @@ export const PicksForYouSection = ({
                     {/* Book Details */}
                     <div className="flex flex-col flex-grow pt-2">
                         <Rating count={featuredBook.rating} />
-                        <h3
-                            className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2 leading-tight transition duration-150 hover:text-green-600 cursor-pointer"
-                            onClick={(e) => e.stopPropagation()} // Prevent tracking click
-                        >
+                        <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-2 leading-tight transition duration-150 hover:text-green-600 cursor-pointer">
                             {featuredBook.title}
                         </h3>
-                        <p
-                            className="text-base text-gray-600 italic mt-1 font-medium transition duration-150 hover:text-green-600 cursor-pointer"
-                            onClick={(e) => e.stopPropagation()} // Prevent tracking click
-                        >
+                        <p className="text-base text-gray-600 italic mt-1 font-medium transition duration-150 hover:text-green-600 cursor-pointer">
                             {featuredBook.author}
                         </p>
 
@@ -185,9 +193,10 @@ export const PicksForYouSection = ({
                             ${featuredBook.price.toFixed(2)}
                         </p>
 
+                        {/* Add To Cart button (ProductCard style) */}
                         <button
-                            className="mt-4 flex items-center justify-center space-x-2 bg-green-700 text-white text-lg font-semibold py-3 px-6 rounded-xl hover:bg-green-800 transition-colors shadow-lg shadow-green-200/50 w-full sm:w-fit"
-                            onClick={(e) => e.stopPropagation()} // Prevent tracking click
+                            className="mt-4 flex items-center justify-center space-x-2 bg-green-700 text-white text-sm font-bold py-2.5 px-6 rounded-full hover:bg-green-800 transition-colors shadow-lg shadow-green-200/50 w-full sm:w-fit"
+                            onClick={(e) => e.stopPropagation()}
                         >
                             <ShoppingCart size={20} strokeWidth={2.5} />
                             <span>Add To Cart</span>
@@ -199,7 +208,6 @@ export const PicksForYouSection = ({
                 <div className="lg:col-span-1 bg-white">
                     <div className="grid grid-cols-1 bg-white sm:grid-cols-2 gap-x-6 gap-y-4">
                         {smallBooks.map((book, index) => (
-                            // 🌟 MODIFICATION 5: Pass onViewProduct to SmallBookItem
                             <SmallBookItem
                                 key={index}
                                 book={book}

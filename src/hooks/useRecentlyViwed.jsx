@@ -1,4 +1,4 @@
-// src/hooks/useRecentlyViewed.jsx
+// src/hooks/useRecentlyViwed.jsx
 
 import { useState, useEffect } from "react";
 
@@ -45,10 +45,14 @@ const useRecentlyViewed = () => {
         });
     };
 
+    // 🌟 NEW: Helper boolean for conditional rendering
+    const hasViewedItems = viewedItems.length > 0;
+
     return {
         viewedItems,
         addRecentlyViewed,
-        MAX_ITEMS, // Useful for displaying to the user
+        MAX_ITEMS,
+        hasViewedItems, // 🌟 EXPORT NEW HELPER
     };
 };
 

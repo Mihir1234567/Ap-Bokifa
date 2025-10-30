@@ -1,9 +1,9 @@
-// ProductCarousel.js
+// ProductCarousel.jsx
 
 import React from "react";
 import Slider from "react-slick";
-import ProductCard from "./ProductCard"; // Assuming this path is correct
-import ALL_PRODUCTS from "../productsData"; // Assuming this path is correct
+import ProductCard from "./ProductCard";
+import ALL_PRODUCTS from "../productsData";
 
 // Import react-slick styles
 import "slick-carousel/slick/slick.css";
@@ -11,7 +11,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { s } from "framer-motion/client";
 
 // Reusable ProductCarousel component
-// 🌟 MODIFICATION 1: Accept the onViewProduct prop
+// 🌟 Change: Accept the onViewProduct prop
 const ProductCarousel = ({ title, productIds, onViewProduct }) => {
     // Filter ALL_PRODUCTS based on the passed IDs
     const products = productIds
@@ -21,13 +21,14 @@ const ProductCarousel = ({ title, productIds, onViewProduct }) => {
     // Configuration settings for the react-slick carousel
     const sliderSettings = {
         dots: false,
-        infinite: false, // Only be infinite if there are more products than can be shown
+        infinite: false,
         speed: 500,
-        arrows: false, // Show the default navigation arrows
-        slidesToShow: 6, // Default for desktop (screens >= 1200px)
+        arrows: false,
+        slidesToShow: 6,
         slidesToScroll: 1,
         swipeToSlide: true,
         responsive: [
+            // ... (rest of responsive settings)
             {
                 // Custom breakpoint: screens < 1200px, show 2 large cards
                 breakpoint: 1200,
@@ -36,19 +37,18 @@ const ProductCarousel = ({ title, productIds, onViewProduct }) => {
                 },
             },
             {
-                // Custom breakpoint: screens < 575px, show 1 large card
-                breakpoint: 575,
-                settings: {
-                    slidesToShow: 1,
-                },
+                // Custom breakpoint: screens < 5...
             },
         ],
     };
 
     return (
-        <div className="w-full bg-white mx-auto py-8 px-4 pt-20 sm:px-6 font-sans">
-            <div className="flex justify-between items-center mb-5">
-                <h2 className="text-3xl font-bold text-gray-800">{title}</h2>
+        <div className="py-12 px-4 sm:px-8 bg-gray-50">
+            {/* Header section (unchanged) */}
+            <div className="flex justify-between items-center mb-8">
+                <h2 className="text-4xl font-serif font-light text-gray-900">
+                    {title}
+                </h2>
                 <div className="flex items-center space-x-4">
                     <a
                         href="#"
@@ -77,8 +77,7 @@ const ProductCarousel = ({ title, productIds, onViewProduct }) => {
                 <Slider {...sliderSettings}>
                     {products.map((product) => (
                         <div key={product.id} className="p-2">
-                            {/* The padding creates the 'gap' between slides */}
-                            {/* 🌟 MODIFICATION 2: Pass onViewProduct to ProductCard */}
+                            {/* 🌟 Change: Pass the onViewProduct prop down to ProductCard */}
                             <ProductCard
                                 product={product}
                                 onViewProduct={onViewProduct}

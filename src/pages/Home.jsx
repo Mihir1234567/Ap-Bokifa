@@ -1,4 +1,4 @@
-// src/pages/Home.jsx
+// Home.jsx
 
 import React from "react";
 import { HeaderCorousel } from "../components/hero/HeaderCorousel";
@@ -15,16 +15,17 @@ import { ClintTestemonialSection } from "../components/product/ClintTestemonialS
 import { Services } from "../components/product/Services";
 import NewsAndEvents from "../components/product/NewsAndEvents";
 import NewsletterSocials from "../components/product/NewsletterSocials";
-import useRecentlyViewed from "../hooks/useRecentlyViwed"; // Imported hook
+import useRecentlyViewed from "../hooks/useRecentlyViwed"; // 👈 Hook Import
 
 const Home = () => {
-    const { addRecentlyViewed } = useRecentlyViewed(); // Get the function
+    // 1. Initialize the hook function
+    const { addRecentlyViewed } = useRecentlyViewed();
 
+    // 2. Define all necessary ID arrays (Fixes ReferenceError)
     const BestSellingIds = ALL_PRODUCTS.filter(
         (product) => product.currentBestselling
     ).map((product) => product.id);
 
-    // ... (other product filters remain unchanged)
     const isHighlightIds = ALL_PRODUCTS.filter(
         (product) => product.isHighlight
     ).map((product) => product.id);
@@ -45,32 +46,29 @@ const Home = () => {
         <main className="flex-grow">
             <HeaderCorousel />
             <StatMarquee />
+            {/* 3. Pass the handler to all product-displaying components */}
             <ProductCarousel
                 title="This week's highlights"
                 productIds={isHighlightIds}
-                // PASS DOWN: Passing the function to the carousel
                 onViewProduct={addRecentlyViewed}
             />
             <Categories></Categories>
             <ProductCarousel
                 title="Current Bestsellers"
                 productIds={BestSellingIds}
-                // PASS DOWN: Passing the function to the carousel
                 onViewProduct={addRecentlyViewed}
             />
             <ThrillerBanner />
             <ProductCarousel
                 title="Current Bestsellers"
                 productIds={HalfPriced}
-                // PASS DOWN: Passing the function to the carousel
                 onViewProduct={addRecentlyViewed}
             />
             <BannerGrid />
             <PicksForYouSection
                 featuredBooks={featuredBook}
                 smallBook={smallBooks}
-                // PASS DOWN: Passing the function to the section
-                onViewProduct={addRecentlyViewed}
+                onViewProduct={addRecentlyViewed} // Also ensure this component accepts and passes it down
             />
             <FeaturedAuthors></FeaturedAuthors>
             <ClintTestemonialSection />

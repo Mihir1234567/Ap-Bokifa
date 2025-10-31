@@ -88,6 +88,7 @@ const Footer = () => {
 
     return (
         <>
+            
             {/* Main Footer Wrapper */}
             <footer className="bg-white relative pt-12">
                 {/* Main content container */}

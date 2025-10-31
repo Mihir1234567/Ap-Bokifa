@@ -6,6 +6,8 @@ import {
     Bars3Icon,
     XMarkIcon,
 } from "@heroicons/react/20/solid";
+// IMPORTANT: You must install and wrap your App in a <BrowserRouter>
+import { Link } from "react-router-dom";
 
 // --- Custom Hook to detect screen size ---
 const useIsDesktop = () => {
@@ -143,7 +145,7 @@ const Dropdown = ({ selected, items, onSelect, buttonClass, menuClass }) => {
     );
 };
 
-// --- NavDropdown (Hover-based) - FIXED ---
+// --- NavDropdown (Hover-based) ---
 const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
     const [isOpen, setIsOpen] = useState(false);
     const isDesktop = useIsDesktop();
@@ -156,9 +158,9 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
                     <div className="py-8 px-8 max-w-screen-2xl mx-auto">
                         <div className="flex justify-between space-x-4">
                             {items.layouts.map((layout, index) => (
-                                <a
+                                <Link // Use Link
                                     key={index}
-                                    href={layout.href || "#"}
+                                    to={layout.path || "#"} // Use 'to' and 'path'
                                     className="flex flex-col items-center group w-1/5 min-w-0"
                                 >
                                     <div className="relative overflow-hidden rounded-md shadow-lg transition duration-300 group-hover:shadow-xl group-hover:scale-[1.01]">
@@ -171,7 +173,7 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
                                     <p className="mt-4 font-medium text-black decoration-2 underline hover:text-[#3AB757] transition-all duration-300 ease-in-out text-center text-sm tracking-normal hover:tracking-widest">
                                         {layout.title}
                                     </p>
-                                </a>
+                                </Link>
                             ))}
                         </div>
                     </div>
@@ -191,13 +193,13 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
                                     {columnTitle}
                                 </h4>
                                 {items[columnTitle].map((item) => (
-                                    <a
-                                        key={item}
-                                        href="#"
+                                    <Link // Use Link
+                                        key={item.title} // Use object title
+                                        to={item.path || "#"} // Use object path
                                         className="block text-sm text-gray-700 py-1.5 hover:text-[#3AB757]"
                                     >
-                                        {item}
-                                    </a>
+                                        {item.title}
+                                    </Link>
                                 ))}
                             </div>
                         ))}
@@ -231,17 +233,17 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
             return (
                 <>
                     {items.map((item, index) => (
-                        <a
-                            key={item}
-                            href="#"
+                        <Link // Use Link
+                            key={item.title} // Use object title
+                            to={item.path || "#"} // Use object path
                             className={`block px-4 py-3 text-gray-800 hover:text-[#3AB757] hover:bg-gray-100 ${
                                 index < items.length - 1
                                     ? "border-b border-gray-200"
                                     : ""
                             }`}
                         >
-                            {item}
-                        </a>
+                            {item.title}
+                        </Link>
                     ))}
                 </>
             );
@@ -313,13 +315,13 @@ const UserDropdown = ({ items }) => {
                                     bg-white shadow-lg rounded-md py-2 z-50 w-40`}
                     >
                         {items.map((item) => (
-                            <a
+                            <Link // Use Link
                                 key={item.title}
-                                href={item.href || "#"}
+                                to={item.path || "#"} // Use 'to' and 'path'
                                 className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 text-sm whitespace-nowrap"
                             >
                                 {item.title}
-                            </a>
+                            </Link>
                         ))}
                     </motion.div>
                 )}
@@ -357,13 +359,13 @@ const MobileNestedDropdown = ({ title, items }) => {
                         className="overflow-hidden"
                     >
                         {items.map((item) => (
-                            <a
-                                key={item}
-                                href="#"
+                            <Link // Use Link
+                                key={item.title}
+                                to={item.path || "#"} // Use 'to' and 'path'
                                 className={`block pl-4 pr-4 py-1.5 text-gray-600 hover:text-[#3AB757] hover:bg-gray-100 text-sm`}
                             >
-                                {item}
-                            </a>
+                                {item.title}
+                            </Link>
                         ))}
                     </motion.div>
                 )}
@@ -387,12 +389,12 @@ const MobileNavItem = ({ title, items }) => {
 
     if (isSimpleLink) {
         return (
-            <a
-                href="#"
+            <Link // Use Link for simple navigation items like "Contact"
+                to={title === "Contact" ? "/contact" : "/"} // Example path for Contact
                 className="block py-4 text-gray-800 font-medium hover:text-[#3AB757] border-b border-gray-200"
             >
                 {title}
-            </a>
+            </Link>
         );
     }
 
@@ -419,24 +421,26 @@ const MobileNavItem = ({ title, items }) => {
         let subLinks = [];
 
         if (Array.isArray(items)) {
-            subLinks = items.map((item) => ({ title: item }));
+            subLinks = items; // Items are already objects {title, path}
         } else if (isHomeLayout) {
-            items.layouts.forEach((layout) =>
-                subLinks.push({ title: layout.title })
+            items.layouts.forEach(
+                (layout) =>
+                    subLinks.push({ title: layout.title, path: layout.path }) // Ensure path is included
             );
         }
 
         return subLinks.map((item, index) => {
             const itemTitle = item.title;
+            const itemPath = item.path || "#";
 
             return (
-                <a
+                <Link // Use Link
                     key={itemTitle + index}
-                    href="#"
+                    to={itemPath}
                     className={`block px-4 py-2 text-gray-600 hover:text-[#3AB757] hover:bg-gray-100`}
                 >
                     {itemTitle}
-                </a>
+                </Link>
             );
         });
     };
@@ -512,30 +516,30 @@ const SearchDrawer = ({ onClose }) => {
                             Popular
                         </h3>
                         <div className="flex flex-col gap-2">
-                            <a
-                                href="#"
+                            <Link // Use Link
+                                to="/collection"
                                 className="text-gray-700 hover:text-[#3AB757]"
                             >
                                 All Collection
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link // Use Link
+                                to="/products"
                                 className="text-gray-700 hover:text-[#3AB757]"
                             >
                                 All Product
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link // Use Link
+                                to="/contact"
                                 className="text-gray-700 hover:text-[#3AB757]"
                             >
                                 Contact
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link // Use Link
+                                to="/blog"
                                 className="text-gray-700 hover:text-[#3AB757]"
                             >
                                 Blog
-                            </a>
+                            </Link>
                         </div>
                     </div>
                     <div>
@@ -543,12 +547,12 @@ const SearchDrawer = ({ onClose }) => {
                             Information
                         </h3>
                         <div className="flex flex-col gap-2">
-                            <a
-                                href="#"
+                            <Link // Use Link
+                                to="/contact"
                                 className="text-gray-700 hover:text-[#3AB757]"
                             >
                                 Contact
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -612,84 +616,92 @@ const Navbar = () => {
         "Japanese",
     ];
 
-    // --- Data ---
+    // --- Data (UPDATED for React Router: path instead of href) ---
     const homeMegaMenu = {
         layouts: [
             {
                 title: "Home One",
-                href: "#",
+                path: "/",
                 imageSrc: "/src/assets/Home1.avif",
             },
             {
                 title: "Home Two",
-                href: "#",
+                path: "/",
                 imageSrc: "/src/assets/Home2.avif",
             },
             {
                 title: "Home Three",
-                href: "#",
+                path: "/",
                 imageSrc: "/src/assets/Home3.avif",
             },
             {
                 title: "Home Four",
-                href: "#",
+                path: "/",
                 imageSrc: "/src/assets/Home4.avif",
             },
             {
                 title: "Home Five",
-                href: "#",
+                path: "/",
                 imageSrc: "/src/assets/Home5.avif",
             },
         ],
     };
-    const homeItems = [
-        "Home One",
-        "Home Two",
-        "Home Three",
-        "Home Four",
-        "Home Five",
-    ];
+    // Use the mega menu layouts for the mobile simple links
+    const homeItems = homeMegaMenu.layouts.map((item) => ({
+        title: item.title,
+        path: item.path,
+    }));
 
     const shopItems = {
         "Shop Layout": [
-            "Shop Grid",
-            "Shop List",
-            "Shop Right Sidebar",
-            "Shop Left Sidebar",
+            { title: "Shop Left Sidebar", path: "/leftSidebar" },
+            { title: "Collection Top", path: "/" },
+            { title: "List Collection", path: "/" },
+            { title: "Coupon", path: "/" },
         ],
         "Product Layout": [
-            "Product Gallery",
-            "Product Slider",
-            "Product Sticky",
-            "Product Full Width",
+            { title: "Product Gallery", path: "/product/gallery" },
+            { title: "Product Slider", path: "/product/slider" },
+            { title: "Product Sticky", path: "/product/sticky" },
+            { title: "Product Full Width", path: "/product/full-width" },
         ],
         "Product Type": [
-            "Simple Product",
-            "Variable Product",
-            "External Product",
-            "Grouped Product",
+            { title: "Simple Product", path: "/product/simple" },
+            { title: "Variable Product", path: "/product/variable" },
+            { title: "External Product", path: "/product/external" },
+            { title: "Grouped Product", path: "/product/grouped" },
         ],
     };
 
-    const blogItems = ["Blog - Standard", "Blog - Grid", "Single Post"];
-    const pagesItems = ["About Us", "Contact", "Our Team", "FAQs", "LookBook"];
+    const blogItems = [
+        { title: "Blog - Standard", path: "/blog/standard" },
+        { title: "Blog - Grid", path: "/blog/grid" },
+        { title: "Single Post", path: "/blog/post" },
+    ];
+    const pagesItems = [
+        { title: "About Us", path: "/about" },
+        { title: "Contact", path: "/contact" },
+        { title: "Our Team", path: "/team" },
+        { title: "FAQs", path: "/faqs" },
+        { title: "LookBook", path: "/lookbook" },
+    ];
 
     const userMenuItems = [
-        { title: "Login", href: "#" },
-        { title: "Sign Up", href: "#" },
-        { title: "Check out", href: "#" },
-        { title: "Wishlist (0)", href: "#" },
-        { title: "Compare (1)", href: "#" },
+        { title: "Login", path: "/login" },
+        { title: "Sign Up", path: "/register" },
+        { title: "Check out", path: "/checkout" },
+        { title: "Wishlist (0)", path: "/wishlist" },
+        { title: "Compare (1)", path: "/compare" },
     ];
 
     // Reusable Logo Component
     const Logo = () => (
-        <a
-            href="#"
+        <Link // Use Link
+            to="/"
             className="text-2xl font-bold text-[#1D4A34] flex items-center"
         >
             <img src="/src/assets/logo_full.webp" alt="Logo" />
-        </a>
+        </Link>
     );
 
     return (
@@ -742,16 +754,12 @@ const Navbar = () => {
                                 >
                                     <Bars3Icon className="h-6 w-6" />
                                 </button>
-                                <a
-                                    href="#"
+                                <button // Changed <a> to <button> for non-navigation action
                                     className="text-gray-600 hover:text-[#1D4A34]"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        setIsSearchOpen(true);
-                                    }}
+                                    onClick={() => setIsSearchOpen(true)}
                                 >
                                     <SearchIcon />
-                                </a>
+                                </button>
                             </div>
                             {/* Desktop Logo */}
                             <div className="hidden xl:block flex-shrink-0">
@@ -801,24 +809,24 @@ const Navbar = () => {
                             </div>
                             {/* Action Icons */}
                             <UserDropdown items={userMenuItems} />
-                            <a
-                                href="#"
+                            <Link // Use Link
+                                to="/wishlist"
                                 className="relative text-gray-600 hover:text-[#1D4A34]"
                             >
                                 <HeartIcon />
                                 <span className="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 text-xs text-white bg-[#3AB757] rounded-full">
                                     0
                                 </span>
-                            </a>
-                            <a
-                                href="#"
+                            </Link>
+                            <Link // Use Link
+                                to="/cart"
                                 className="relative text-gray-600 hover:text-[#1D4A34]"
                             >
                                 <CartIcon />
                                 <span className="absolute -top-2 -right-2 flex items-center justify-center w-5 h-5 text-xs text-white bg-[#3AB757] rounded-full">
                                     0
                                 </span>
-                            </a>
+                            </Link>
                         </div>
                     </div>
                 </div>
@@ -837,12 +845,12 @@ const Navbar = () => {
                             <NavDropdown title="Shop" items={shopItems} />
                             <NavDropdown title="Blogs" items={blogItems} />
                             <NavDropdown title="Pages" items={pagesItems} />
-                            <a
-                                href="#"
+                            <Link // Use Link
+                                to="/contact"
                                 className="flex items-center py-4 text-gray-800 font-medium hover:text-[#3AB757]"
                             >
                                 Contact
-                            </a>
+                            </Link>
                         </nav>
                         <div className="hidden xl:block text-gray-800">
                             <span>Need help? Call Us: </span>
@@ -888,6 +896,7 @@ const Navbar = () => {
                                     title="Pages"
                                     items={pagesItems}
                                 />
+                                {/* MobileNavItem handles the link internally */}
                                 <MobileNavItem title="Contact" items={[]} />
                                 <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
                                     <Dropdown
@@ -907,13 +916,13 @@ const Navbar = () => {
                                 </div>
                             </div>
                             <div className="p-4 border-t border-gray-200">
-                                <a
-                                    href="#"
+                                <Link // Use Link
+                                    to="/account"
                                     className="flex items-center space-x-3 text-gray-800 hover:text-[#1D4A34] font-medium"
                                 >
                                     <UserIcon className="h-5 w-5" />
                                     <span>Account</span>
-                                </a>
+                                </Link>
                             </div>
                         </motion.div>
                         {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}

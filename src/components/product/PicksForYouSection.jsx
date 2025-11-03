@@ -165,7 +165,7 @@ export const PicksForYouSection = ({
                                         className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-green-600 hover:bg-white transition-colors shadow-md"
                                         onClick={(e) => e.stopPropagation()}
                                     >
-                                        <img src="/src/assets/compare.svg" alt="" />
+                                        <img src="/src/assets/compare.svg~" alt="" />
                                     </button>
                                     <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none group-hover/icon:delay-100">
                                         Compare

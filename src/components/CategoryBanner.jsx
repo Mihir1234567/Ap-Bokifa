@@ -1,8 +1,9 @@
 // src/components/product/CategoryBanner.jsx
 
 import React from "react";
+import PropTypes from "prop-types";
 
-const CategoryBanner = () => {
+const CategoryBanner = ({ categoryName, description }) => {
     return (
         <div className="bg-white py-16 px-4 sm:px-6 lg:px-8 text-center border-b border-gray-100">
             {/* Breadcrumb */}
@@ -14,22 +15,33 @@ const CategoryBanner = () => {
                     Home
                 </a>
                 <span className="mx-2">/</span>
-                <span className="text-gray-900 font-medium">Books New</span>
+                {/* Use the categoryName prop */}
+                <span className="text-gray-900 font-medium">
+                    {categoryName}
+                </span>
             </nav>
 
             {/* Page Title */}
+            {/* Use the categoryName prop */}
             <h1 className="text-6xl font-serif font-light text-gray-900 mb-6 tracking-wide">
-                Books New
+                {categoryName}
             </h1>
 
             {/* Subtitle/Description */}
+            {/* Use the description prop */}
             <p className="max-w-3xl mx-auto text-base text-gray-700 leading-relaxed">
-                Discover your favorite book: you will find a wide range of
-                selected books from bestseller to newcomer, children's book to
-                crime novel or thriller to science fiction novel.
+                {description}
             </p>
         </div>
     );
+};
+
+// Add PropTypes for type checking and component documentation
+CategoryBanner.propTypes = {
+    /** The name of the category to display in the title and breadcrumb */
+    categoryName: PropTypes.string.isRequired,
+    /** The descriptive text to display below the title */
+    description: PropTypes.string.isRequired,
 };
 
 export default CategoryBanner;

@@ -1,5 +1,3 @@
-// ProductCard.jsx
-
 import React, { useState } from "react";
 
 const StarRating = ({ rating, reviewCount }) => {
@@ -7,7 +5,8 @@ const StarRating = ({ rating, reviewCount }) => {
     const displayReviewCount = reviewCount === undefined ? 0 : reviewCount;
 
     return (
-        <div className="flex items-center justify-center">
+        // MODIFIED: Added absolute positioning, background, and shadow for the floating effect
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white rounded-full  px-3 py-1.5 flex items-center justify-center z-20 transition-all duration-300">
             <div className="flex text-yellow-400">
                 {[...Array(5)].map((_, i) => (
                     <svg
@@ -37,13 +36,13 @@ const ProductCard = ({ product, onViewProduct }) => {
     return (
         <div
             className="group flex flex-col flex-shrink-0 w-full bg-white rounded-xl shadow-none hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 ease-in-out cursor-pointer"
-            onClick={() => onViewProduct(product)} // 争 Calls the update function
+            onClick={() => onViewProduct(product)} // 🌟 Calls the update function
         >
-            <div className="relative rounded-t-xl overflow-hidden">
+            <div className="relative rounded-t-xl ">
                 <img
                     src={product.imageUrl}
                     alt={product.title}
-                    className="w-full aspect-[2/3] object-cover transition-transform duration-300 rounded-t-xl group-hover:scale-105"
+                    className="w-full aspect-[2/3] object-cover transition-transform duration-300 rounded-t-xl "
                 />
 
                 {/* Discount tag */}
@@ -62,13 +61,18 @@ const ProductCard = ({ product, onViewProduct }) => {
                     </div>
                 )}
 
+                {/* 🌟 NEW: StarRating is now positioned absolutely over the image area */}
+                <StarRating
+                    rating={product.rating}
+                    reviewCount={product.reviewCount}
+                />
+
                 {/* Icon Bar consolidated on the right */}
-                {/* MODIFIED: Outer div is now always visible */}
                 <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-10 transition-opacity duration-300">
                     {/* 1. Wishlist Icon (Heart) - PERMANENTLY VISIBLE */}
                     <button
                         onClick={(e) => {
-                            e.stopPropagation(); // 争 Prevents card click
+                            e.stopPropagation(); // 🌟 Prevents card click
                             setIsWishlisted(!isWishlisted);
                         }}
                         aria-label={
@@ -104,7 +108,7 @@ const ProductCard = ({ product, onViewProduct }) => {
                         <button
                             aria-label="Quick view product details"
                             className="group/icon relative bg-white rounded-full p-2 hover:bg-gray-100 transition-colors shadow-md"
-                            onClick={(e) => e.stopPropagation()} // 争 Prevents card click
+                            onClick={(e) => e.stopPropagation()} // 🌟 Prevents card click
                         >
                             <span className="absolute right-full top-1/2 transform -translate-y-1/2 mr-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 transition-opacity duration-300 group-hover/icon:opacity-100 whitespace-nowrap">
                                 Quick view
@@ -134,7 +138,7 @@ const ProductCard = ({ product, onViewProduct }) => {
                         <button
                             aria-label="Add product to comparison list"
                             className="group/icon relative bg-white rounded-full p-2 hover:bg-gray-100 transition-colors shadow-md"
-                            onClick={(e) => e.stopPropagation()} // 争 Prevents card click
+                            onClick={(e) => e.stopPropagation()} // 🌟 Prevents card click
                         >
                             <span className="absolute right-full top-1/2 transform -translate-y-1/2 mr-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 transition-opacity duration-300 group-hover/icon:opacity-100 whitespace-nowrap">
                                 Add to compare
@@ -150,12 +154,9 @@ const ProductCard = ({ product, onViewProduct }) => {
             </div>
 
             {/* Product details section */}
-            <div className="p-4 flex-grow flex flex-col items-center text-center transition-transform duration-300 group-hover:translate-y-[-8px]">
-                <StarRating
-                    rating={product.rating}
-                    reviewCount={product.reviewCount}
-                />
-
+            {/* MODIFIED: Changed p-4 to pt-8 px-4 pb-4 to add space for the floating StarRating */}
+            <div className="pt-8 px-4 pb-4 flex-grow flex flex-col items-center text-center transition-transform duration-300 group-hover:translate-y-[-8px] ">
+                {/* REMOVED StarRating from here */}
                 <h3 className="text-xl font-serif font-light text-gray-900 leading-snug mt-2">
                     {product.title}
                 </h3>

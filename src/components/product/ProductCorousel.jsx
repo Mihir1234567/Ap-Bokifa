@@ -11,8 +11,12 @@ import "slick-carousel/slick/slick-theme.css";
 import { s } from "framer-motion/client";
 
 // Reusable ProductCarousel component
-// 🌟 Change: Accept the onViewProduct prop
-const ProductCarousel = ({ title, productIds, onViewProduct }) => {
+const ProductCarousel = ({
+    title,
+    productIds,
+    onViewProduct,
+    slidesToShowCount = 4,
+}) => {
     // Filter ALL_PRODUCTS based on the passed IDs
     const products = productIds
         ? ALL_PRODUCTS.filter((p) => productIds.includes(p.id))
@@ -24,27 +28,35 @@ const ProductCarousel = ({ title, productIds, onViewProduct }) => {
         infinite: false,
         speed: 500,
         arrows: false,
-        slidesToShow: 6,
+        slidesToShow: slidesToShowCount, // Dynamic card count
         slidesToScroll: 1,
         swipeToSlide: true,
         responsive: [
-            // ... (rest of responsive settings)
+            // Ensure responsive settings account for screens where 4 cards won't fit well
             {
-                // Custom breakpoint: screens < 1200px, show 2 large cards
                 breakpoint: 1200,
                 settings: {
-                    slidesToShow: 2,
+                    slidesToShow: 3, // Show 3 cards on mid-size laptops
                 },
             },
             {
-                // Custom breakpoint: screens < 5...
+                breakpoint: 768,
+                settings: {
+                    slidesToShow: 2, // Show 2 cards on tablets
+                },
+            },
+            {
+                breakpoint: 500,
+                settings: {
+                    slidesToShow: 1, // Show 1 card on small phones
+                },
             },
         ],
     };
 
     return (
-        <div className="py-12 px-4 sm:px-8 bg-gray-50">
-            {/* Header section (unchanged) */}
+        <div className="py-12 px-4 sm:px-8 bg-white">
+            {/* Header section */}
             <div className="flex justify-between items-center mb-8">
                 <h2 className="text-4xl font-serif font-light text-gray-900">
                     {title}
@@ -72,12 +84,11 @@ const ProductCarousel = ({ title, productIds, onViewProduct }) => {
                 </div>
             </div>
 
-            {/* Carousel Content - REPLACED WITH REACT-SLICK */}
+            {/* Carousel Content */}
             <div className="relative">
                 <Slider {...sliderSettings}>
                     {products.map((product) => (
                         <div key={product.id} className="p-2">
-                            {/* 🌟 Change: Pass the onViewProduct prop down to ProductCard */}
                             <ProductCard
                                 product={product}
                                 onViewProduct={onViewProduct}

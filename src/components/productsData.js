@@ -15,7 +15,10 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Fiction",
+        format: "Hardcover",
+        dateAdded: new Date("2024-03-01"), // New data for sorting
     },
     {
         id: 2,
@@ -31,7 +34,10 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // Set to true from image_654a20.jpg
+        isPickForYou: false,
+        category: "Fantasy",
+        format: "Paperback",
+        dateAdded: new Date("2024-05-15"), // New data for sorting
     },
     {
         id: 3,
@@ -47,7 +53,10 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Fiction",
+        format: "Ebook",
+        dateAdded: new Date("2024-01-20"), // New data for sorting
     },
     {
         id: 4,
@@ -63,7 +72,10 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Fiction",
+        format: "Audio cd",
+        dateAdded: new Date("2024-04-10"),
     },
     {
         id: 5,
@@ -79,14 +91,17 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Fantasy",
+        format: "Hardcover",
+        dateAdded: new Date("2024-03-25"),
     },
     {
         id: 6,
         title: "The Last Thing He Told Me",
         author: "Laura Dave",
         description: "",
-        price: 35.24, // $29.95 displayed
+        price: 35.24,
         rating: 0,
         reviewCount: 0,
         discount: 15,
@@ -95,7 +110,10 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Thriller",
+        format: "Paperback",
+        dateAdded: new Date("2023-10-01"),
     },
     {
         id: 7,
@@ -111,7 +129,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Family",
+        format: "Ebook",
+        dateAdded: new Date("2024-02-14"),
     },
     // --- Current Bestselling Products ---
     {
@@ -128,7 +149,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Thriller",
+        format: "Audio cd",
+        dateAdded: new Date("2023-11-20"),
     },
     {
         id: 9,
@@ -144,7 +168,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Classics",
+        format: "Hardcover",
+        dateAdded: new Date("2023-08-01"),
     },
     {
         id: 10,
@@ -161,8 +188,11 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // Set to true from image_654a20.jpg
+        isPickForYou: false,
         isFeatured: true,
+        category: "Fiction",
+        format: "Paperback",
+        dateAdded: new Date("2024-06-05"),
     },
     {
         id: 11,
@@ -178,7 +208,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Family",
+        format: "Ebook",
+        dateAdded: new Date("2024-01-15"),
     },
     {
         id: 12,
@@ -194,7 +227,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Thriller",
+        format: "Audio cd",
+        dateAdded: new Date("2024-04-01"),
     },
     {
         id: 13,
@@ -210,14 +246,17 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Horror",
+        format: "Hardcover",
+        dateAdded: new Date("2023-09-10"),
     },
     {
         id: 14,
         title: "THE WOMEN",
         author: "KRISTIN HANNAH",
         description: "",
-        price: 35.24, // $29.95 displayed
+        price: 35.24,
         rating: 0,
         reviewCount: 0,
         discount: 15,
@@ -226,7 +265,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Family",
+        format: "Paperback",
+        dateAdded: new Date("2024-02-28"),
     },
     {
         id: 15,
@@ -242,14 +284,17 @@ const ALL_PRODUCTS = [
         isHighlight: true,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Horror",
+        format: "Ebook",
+        dateAdded: new Date("2023-12-12"),
     },
     {
         id: 16,
         title: "Playground",
         author: "RICHARD POWERS",
         description: "",
-        price: 35.24, // $29.95 displayed
+        price: 35.24,
         rating: 0,
         reviewCount: 0,
         discount: 15,
@@ -258,7 +303,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Family",
+        format: "Audio cd",
+        dateAdded: new Date("2024-03-10"),
     },
     {
         id: 17,
@@ -274,7 +322,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Fantasy",
+        format: "Hardcover",
+        dateAdded: new Date("2024-05-20"),
     },
     // --- New Products Added (from Half price books and others) ---
     {
@@ -291,7 +342,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Horror",
+        format: "Paperback",
+        dateAdded: new Date("2024-06-15"),
     },
     {
         id: 19,
@@ -307,14 +361,17 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Fiction",
+        format: "Ebook",
+        dateAdded: new Date("2023-10-25"),
     },
     {
         id: 20,
         title: "ERASURE",
         author: "PERCIVAL EVERETT",
         description: "",
-        price: 35.24, // $29.95 displayed
+        price: 35.24,
         rating: 0,
         reviewCount: 0,
         discount: 15,
@@ -323,7 +380,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Classics",
+        format: "Audio cd",
+        dateAdded: new Date("2024-05-05"),
     },
     {
         id: 21,
@@ -339,7 +399,10 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: true,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Family",
+        format: "Hardcover",
+        dateAdded: new Date("2024-06-10"),
     },
     {
         id: 22,
@@ -355,104 +418,125 @@ const ALL_PRODUCTS = [
         isHighlight: false,
         isHalfPrice: true,
         isSoldOut: false,
-        isPickForYou: false, // New standardized label
+        isPickForYou: false,
+        category: "Romance",
+        format: "Paperback",
+        dateAdded: new Date("2024-06-01"),
     },
     // --- New Products Added from 'image_654a20.jpg' (Pick for you) ---
     {
         id: 23,
         title: "Harry Potter And The Sorcerer's Stone",
-        author: "Ap Bokifa", // Placeholder
+        author: "J. K. Rowling",
         description: "",
         price: 269.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
-        imageUrl: "/src/assets/harry.webp", // Placeholder path
+        discount: 0,
+        imageUrl: "/src/assets/harry.webp",
         currentBestselling: false,
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
         isPickForYou: true,
+        category: "Fantasy",
+        format: "Ebook",
+        dateAdded: new Date("2023-09-01"),
     },
     {
         id: 24,
         title: "Memoirs Of A Geisha",
-        author: "ANDY WEIR", // Author from cover
+        author: "ANDY WEIR",
         description: "",
         price: 289.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
-        imageUrl: "/src/assets/memoirs_of_a_geisha.webp", // Placeholder path
+        discount: 0,
+        imageUrl: "/src/assets/memoirs_of_a_geisha.webp",
         currentBestselling: false,
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
         isPickForYou: true,
+        category: "Romance",
+        format: "Audio cd",
+        dateAdded: new Date("2024-03-18"),
     },
     {
         id: 25,
         title: "Scattershot: Life, Music, Elton, and Me",
-        author: "Ap Bokifa", // Placeholder
+        author: "Bernie Taupin",
         description: "",
         price: 309.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
-        imageUrl: "/src/assets/Scattershot.webp", // Placeholder path
+        discount: 0,
+        imageUrl: "/src/assets/Scattershot.webp",
         currentBestselling: false,
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
         isPickForYou: true,
+        category: "Biography",
+        format: "Hardcover",
+        dateAdded: new Date("2024-05-28"),
     },
     {
         id: 26,
         title: "The Catcher In The Rye",
-        author: "Ap Bokifa", // Placeholder
+        author: "J. D. Salinger",
         description: "",
         price: 329.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
-        imageUrl: "/src/assets/The_Catcher_In_The_Rye.webp", // Placeholder path
+        discount: 0,
+        imageUrl: "/src/assets/The_Catcher_In_The_Rye.webp",
         currentBestselling: false,
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
         isPickForYou: true,
+        category: "Classics",
+        format: "Paperback",
+        dateAdded: new Date("2023-11-01"),
     },
     {
         id: 27,
         title: "The City And Its Uncertain Walls: A Novel",
-        author: "Ap Bokifa", // Placeholder
+        author: "Haruki Murakami",
         description: "",
         price: 339.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
-        imageUrl: "/src/assets/The_City_And_Its_Uncertain_Walls.webp", // Placeholder path
+        discount: 0,
+        imageUrl: "/src/assets/The_City_And_Its_Uncertain_Walls.webp",
         currentBestselling: false,
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
         isPickForYou: true,
+        category: "Fantasy",
+        format: "Ebook",
+        dateAdded: new Date("2024-06-20"),
     },
     {
         id: 28,
         title: "The House Of The Spirits",
-        author: "CARL MATT DINNIMAN", // Author from cover (Dungeon Crawler)
+        author: "Isabel Allende",
         description: "",
         price: 29.95,
         rating: 0,
         reviewCount: 0,
-        discount: 0, // No discount tag visible
-        imageUrl: "/src/assets/The_House_Of_The_Spirits.webp", // Placeholder path
+        discount: 0,
+        imageUrl: "/src/assets/The_House_Of_The_Spirits.webp",
         currentBestselling: false,
         isHighlight: false,
         isHalfPrice: false,
         isSoldOut: false,
         isPickForYou: true,
+        category: "Fiction",
+        format: "Hardcover",
+        dateAdded: new Date("2023-12-05"),
     },
 ];
 

@@ -2,6 +2,8 @@ content: ["./index.html", "./src/**/*.{js,jsx}"];
 module.exports = {
     theme: {
         extend: {
+            backgroundOpacity: ["active"],
+
             animation: {
                 // RENAME: Use a single-use slide-in animation
                 "slide-in-up":

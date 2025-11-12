@@ -31,22 +31,53 @@ const useRecentlyViewed = () => {
 
     // Function to add a product to the recently viewed list
     const addRecentlyViewed = (product) => {
+        // Use updater form to compute newItems and persist immediately
         setViewedItems((currentItems) => {
-            // 1. Remove the product if it's already in the list to move it to the front
             const filtered = currentItems.filter(
                 (item) => item.id !== product.id
             );
+            const newItems = [product, ...filtered].slice(0, MAX_ITEMS);
 
-            // 2. Add the new product to the beginning
-            const newItems = [product, ...filtered];
+            // Persist to localStorage synchronously to keep other tabs/windows in sync
+            try {
+                window.localStorage.setItem(
+                    STORAGE_KEY,
+                    JSON.stringify(newItems)
+                );
+            } catch (error) {
+                console.error("Error writing to local storage:", error);
+            }
 
-            // 3. Limit the array size (e.g., to the 5 most recent items)
-            return newItems.slice(0, MAX_ITEMS);
+            // Broadcast update within the same window so other components update instantly
+            try {
+                const event = new CustomEvent("recently-viewed-updated", {
+                    detail: newItems,
+                });
+                window.dispatchEvent(event);
+            } catch {
+                // If CustomEvent isn't available for some reason, ignore silently
+            }
+
+            return newItems;
         });
     };
 
     // 🌟 NEW: Helper boolean for conditional rendering
     const hasViewedItems = viewedItems.length > 0;
+
+    // Listen for broadcasts inside the same window so different components using this hook
+    // update instantly when any component adds a recently viewed item.
+    useEffect(() => {
+        const handler = (e) => {
+            if (e && e.detail) {
+                setViewedItems(e.detail);
+            }
+        };
+
+        window.addEventListener("recently-viewed-updated", handler);
+        return () =>
+            window.removeEventListener("recently-viewed-updated", handler);
+    }, []);
 
     return {
         viewedItems,

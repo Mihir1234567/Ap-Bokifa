@@ -5,7 +5,7 @@ import PropTypes from "prop-types";
 
 const CategoryBanner = ({ categoryName, description }) => {
     return (
-        <div className="bg-white py-16 px-4 sm:px-6 lg:px-8 text-center border-b border-gray-100">
+        <div className="bg-white py-16  text-center ">
             {/* Breadcrumb */}
             <nav className="mb-4 text-sm font-normal text-gray-500">
                 <a href="/" className="hover:text-gray-700">

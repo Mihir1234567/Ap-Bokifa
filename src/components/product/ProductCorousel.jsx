@@ -16,6 +16,9 @@ const ProductCarousel = ({
     productIds,
     onViewProduct,
     slidesToShowCount = 4,
+    // --- NEW PROPS ---
+    showBrowseButton = true, // Default to true to not break other components
+    titleCenter = false, // Default to false
 }) => {
     // Filter ALL_PRODUCTS based on the passed IDs
     const products = productIds
@@ -56,32 +59,40 @@ const ProductCarousel = ({
 
     return (
         <div className="py-12 px-4 sm:px-8 bg-white">
-            {/* Header section */}
-            <div className="flex justify-between items-center mb-8">
+            {/* --- MODIFIED Header section --- */}
+            <div
+                className={`flex ${
+                    titleCenter ? "justify-center" : "justify-between"
+                } items-center mb-8`}
+            >
                 <h2 className="text-4xl font-serif font-light text-gray-900">
                     {title}
                 </h2>
-                <div className="flex items-center space-x-4">
-                    <a
-                        href="#"
-                        className="
-                            inline-flex items-center
-                            justify-center
-                            px-6 py-3
-                            rounded-full
-                            bg-white shadow-lg
-                            text-base font-semibold text-gray-900
-                            whitespace-nowrap
-                            transition-all duration-300
-                            hover:bg-gray-900
-                            hover:text-white
-                            hover:shadow-xl
-                        "
-                    >
-                        Browse All
-                        <span className="ml-2 leading-none">&gt;</span>
-                    </a>
-                </div>
+
+                {/* --- MODIFIED: Conditionally show button --- */}
+                {showBrowseButton && (
+                    <div className="flex items-center space-x-4">
+                        <a
+                            href="#"
+                            className="
+                                inline-flex items-center
+                                justify-center
+                                px-6 py-3
+                                rounded-full
+                                bg-white shadow-lg
+                                text-base font-semibold text-gray-900
+                                whitespace-nowrap
+                                transition-all duration-300
+                                hover:bg-gray-900
+                                hover:text-white
+                                hover:shadow-xl
+                            "
+                        >
+                            Browse All
+                            <span className="ml-2 leading-none">&gt;</span>
+                        </a>
+                    </div>
+                )}
             </div>
 
             {/* Carousel Content */}

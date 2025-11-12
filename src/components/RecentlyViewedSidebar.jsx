@@ -88,7 +88,7 @@ const RecentlyViewedSidebar = () => {
             {hasViewedItems && (
                 <button
                     onClick={openSidebar}
-                    className="fixed bottom-20 left-5 z-50 w-25 h-25 rounded-full bg-white shadow-2xl overflow-hidden hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center"
+                    className="fixed bottom-20 left-5 z-40 w-25 h-25 rounded-full bg-white shadow-2xl overflow-hidden hover:scale-105 transition-transform duration-300 ease-in-out flex items-center justify-center"
                     title={`Recently Viewed Products (${itemCount})`}
                 >
                     {shouldRotate ? (

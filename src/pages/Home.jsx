@@ -1,6 +1,6 @@
 // Home.jsx
 
-import React from "react";
+import React, { useEffect } from "react";
 import { HeaderCorousel } from "../components/hero/HeaderCorousel";
 import StatMarquee from "../components/hero/StatMarquee";
 import ProductCarousel from "../components/product/ProductCorousel";
@@ -14,8 +14,13 @@ import { ClintTestemonialSection } from "../components/product/ClintTestemonialS
 import { Services } from "../components/product/Services";
 import NewsAndEvents from "../components/product/NewsAndEvents";
 import useRecentlyViewed from "../hooks/useRecentlyViwed"; // 👈 Hook Import
+import { s } from "framer-motion/client";
 
-const Home = () => {
+const Home = ({ showCoupon }) => {
+    useEffect(() => {
+        showCoupon && showCoupon();
+    }, []);
+
     // 1. Initialize the hook function
     const { addRecentlyViewed } = useRecentlyViewed();
 

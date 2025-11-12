@@ -1,0 +1,13 @@
+{
+  "project": "bokifa",
+  "tasks": [
+    {
+      "task": "Upsell popup",
+      "ETA": "1.5hr"
+    },
+    {
+      "task": "Crosssell popup",
+      "ETA": "1.5hr"
+    }
+  ]
+}

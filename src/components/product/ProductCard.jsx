@@ -1,17 +1,26 @@
+// ProductCard.jsx
+
 import React, { useState } from "react";
 
-const StarRating = ({ rating, reviewCount }) => {
+// StarRating component remains unchanged
+const StarRating = ({ rating, reviewCount, variant = "default" }) => {
     const filledStars = Math.floor(rating || 0);
     const displayReviewCount = reviewCount === undefined ? 0 : reviewCount;
+    const isSmall = variant === "small";
 
     return (
-        // MODIFIED: Added absolute positioning, background, and shadow for the floating effect
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white rounded-full  px-3 py-1.5 flex items-center justify-center z-20 transition-all duration-300">
+        <div
+            className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 bg-white rounded-full flex items-center justify-center z-20 transition-all duration-300 shadow-lg ${
+                isSmall ? "px-2 py-0.5" : "px-3 py-1.5"
+            }`}
+        >
             <div className="flex text-yellow-400">
                 {[...Array(5)].map((_, i) => (
                     <svg
                         key={i}
-                        className={`w-4 h-4 fill-current ${
+                        className={`fill-current ${
+                            isSmall ? "w-2.5 h-2.5" : "w-4 h-4"
+                        } ${
                             i < filledStars
                                 ? "text-yellow-400"
                                 : "text-gray-300"
@@ -23,20 +32,26 @@ const StarRating = ({ rating, reviewCount }) => {
                     </svg>
                 ))}
             </div>
-            <span className="text-gray-500 text-sm ml-1">
+            <span
+                className={`ml-1 ${
+                    isSmall ? "text-[10px]" : "text-sm"
+                } text-gray-500`}
+            >
                 ({displayReviewCount || 0})
             </span>
         </div>
     );
 };
 
-const ProductCard = ({ product, onViewProduct }) => {
+const ProductCard = ({ product, onViewProduct, variant = "default" }) => {
     const [isWishlisted, setIsWishlisted] = useState(false);
+
+    const isSmall = variant === "small";
 
     return (
         <div
             className="group flex flex-col flex-shrink-0 w-full bg-white rounded-xl shadow-none hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 ease-in-out cursor-pointer"
-            onClick={() => onViewProduct(product)} // 🌟 Calls the update function
+            onClick={() => onViewProduct(product)} // 検 Calls the update function
         >
             <div className="relative rounded-t-xl ">
                 <img
@@ -47,32 +62,48 @@ const ProductCard = ({ product, onViewProduct }) => {
 
                 {/* Discount tag */}
                 {product.discount && (
-                    <div className="absolute top-3 left-3 bg-red-600 text-white text-base font-bold rounded-full w-10 h-10 flex items-center justify-center z-10">
-                        <span className="text-xs font-semibold">
+                    <div
+                        className={`absolute top-2 left-2 bg-red-600 text-white font-bold rounded-full flex items-center justify-center z-10 ${
+                            isSmall ? "w-7 h-7" : "w-10 h-10"
+                        }`}
+                    >
+                        <span className={isSmall ? "text-[9px]" : "text-xs"}>
                             -{product.discount}%
                         </span>
                     </div>
                 )}
                 {product.isSoldOut && (
-                    <div className="absolute top-3 left-3 bg-gray-600 text-white text-base font-bold rounded-full w-10 h-10 flex items-center justify-center z-10">
-                        <span className="text-xs text-center font-semibold">
+                    <div
+                        className={`absolute top-2 left-2 bg-gray-600 text-white font-bold rounded-full flex items-center justify-center z-10 ${
+                            isSmall ? "w-7 h-7" : "w-10 h-10"
+                        }`}
+                    >
+                        <span
+                            className={`text-center font-semibold ${
+                                isSmall ? "text-[9px]" : "text-xs"
+                            }`}
+                        >
                             Sold Out
                         </span>
                     </div>
                 )}
 
-                {/* 🌟 NEW: StarRating is now positioned absolutely over the image area */}
-                <StarRating
-                    rating={product.rating}
-                    reviewCount={product.reviewCount}
-                />
+                {/* 💡 MODIFIED: Star Rating is now conditional */}
+                {/* It will NOT render if variant="small" */}
+                {!isSmall && (
+                    <StarRating
+                        rating={product.rating}
+                        reviewCount={product.reviewCount}
+                        variant={variant}
+                    />
+                )}
 
                 {/* Icon Bar consolidated on the right */}
                 <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-10 transition-opacity duration-300">
                     {/* 1. Wishlist Icon (Heart) - PERMANENTLY VISIBLE */}
                     <button
                         onClick={(e) => {
-                            e.stopPropagation(); // 🌟 Prevents card click
+                            e.stopPropagation(); // 検 Prevents card click
                             setIsWishlisted(!isWishlisted);
                         }}
                         aria-label={
@@ -80,10 +111,14 @@ const ProductCard = ({ product, onViewProduct }) => {
                                 ? "Remove from wishlist"
                                 : "Add to wishlist"
                         }
-                        className="bg-white rounded-full p-2 hover:bg-gray-100 transition-colors shadow-md"
+                        className={`rounded-full hover:bg-gray-100 transition-colors shadow-md ${
+                            isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
+                        }`}
                     >
                         <svg
-                            className={`w-5 h-5 ${
+                            className={`${
+                                isSmall ? "w-3.5 h-3.5" : "w-5 h-5"
+                            } ${
                                 isWishlisted
                                     ? "text-red-500 fill-current"
                                     : "text-gray-900"
@@ -107,14 +142,18 @@ const ProductCard = ({ product, onViewProduct }) => {
                         {/* 2. Quick View */}
                         <button
                             aria-label="Quick view product details"
-                            className="group/icon relative bg-white rounded-full p-2 hover:bg-gray-100 transition-colors shadow-md"
-                            onClick={(e) => e.stopPropagation()} // 🌟 Prevents card click
+                            className={`group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
+                                isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
+                            }`}
+                            onClick={(e) => e.stopPropagation()} // 検 Prevents card click
                         >
                             <span className="absolute right-full top-1/2 transform -translate-y-1/2 mr-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 transition-opacity duration-300 group-hover/icon:opacity-100 whitespace-nowrap">
                                 Quick view
                             </span>
                             <svg
-                                className="w-5 h-5 text-gray-700"
+                                className={`${
+                                    isSmall ? "w-3.5 h-3.5" : "w-5 h-5"
+                                } text-gray-700`}
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -137,8 +176,10 @@ const ProductCard = ({ product, onViewProduct }) => {
                         {/* 3. Compare */}
                         <button
                             aria-label="Add product to comparison list"
-                            className="group/icon relative bg-white rounded-full p-2 hover:bg-gray-100 transition-colors shadow-md"
-                            onClick={(e) => e.stopPropagation()} // 🌟 Prevents card click
+                            className={`group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
+                                isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
+                            }`}
+                            onClick={(e) => e.stopPropagation()} // 検 Prevents card click
                         >
                             <span className="absolute right-full top-1/2 transform -translate-y-1/2 mr-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 transition-opacity duration-300 group-hover/icon:opacity-100 whitespace-nowrap">
                                 Add to compare
@@ -146,7 +187,7 @@ const ProductCard = ({ product, onViewProduct }) => {
                             <img
                                 src="/src/assets/compare.svg"
                                 alt="update-left-rotation"
-                                className="h-5 "
+                                className={isSmall ? "h-3.5" : "h-5"}
                             />
                         </button>
                     </div>
@@ -154,26 +195,44 @@ const ProductCard = ({ product, onViewProduct }) => {
             </div>
 
             {/* Product details section */}
-            {/* MODIFIED: Changed p-4 to pt-8 px-4 pb-4 to add space for the floating StarRating */}
-            <div className="pt-8 px-4 pb-4 flex-grow flex flex-col items-center text-center transition-transform duration-300 group-hover:translate-y-[-8px] ">
-                {/* REMOVED StarRating from here */}
-                <h3 className="text-xl font-serif font-light text-gray-900 leading-snug mt-2">
+            {/* 💡 MODIFIED: Adjusted padding for small variant */}
+            <div
+                className={`flex-grow flex flex-col items-center text-center transition-transform duration-300 group-hover:translate-y-[-8px] ${
+                    isSmall ? "pt-3 px-2 pb-2" : "pt-8 px-4 pb-4"
+                }`}
+            >
+                {/* 💡 Smaller title font (text-sm) and added font-medium */}
+                <h3
+                    className={`font-serif font-light text-gray-900 leading-snug ${
+                        isSmall ? "text-sm font-medium mt-1" : "text-xl mt-2"
+                    }`}
+                >
                     {product.title}
                 </h3>
 
                 <a
                     href="#"
-                    className="text-base text-gray-500 mt-1 hover:text-gray-900 hover:underline"
+                    // 💡 Smaller author font
+                    className={`mt-1 hover:text-gray-900 hover:underline ${
+                        isSmall
+                            ? "text-xs text-gray-600"
+                            : "text-base text-gray-500"
+                    }`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {product.author}
                 </a>
 
+                {/* 💡 Smaller price font */}
                 <p
                     className={
                         product.isSoldOut
-                            ? "text-2xl font-bold text-gray-500 mt-3 "
-                            : "text-2xl font-bold text-green-700 mt-3"
+                            ? `font-bold text-gray-500 ${
+                                  isSmall ? "text-lg mt-2" : "text-2xl mt-3"
+                              }`
+                            : `font-bold text-green-700 ${
+                                  isSmall ? "text-lg mt-2" : "text-2xl mt-3"
+                              }`
                     }
                 >
                     ${product.price}
@@ -181,18 +240,31 @@ const ProductCard = ({ product, onViewProduct }) => {
             </div>
 
             {/* Add to Cart button slides up */}
-            <div className="p-3 pt-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out transform -translate-y-24 group-hover:translate-y-0">
+            {/* 💡 Adjusted slide-up distance */}
+            <div
+                className={`p-3 pt-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out transform ${
+                    isSmall ? "-translate-y-16" : "-translate-y-24"
+                } group-hover:translate-y-0`}
+            >
                 <button
+                    // 💡 Smaller button text and padding
                     className={
                         product.isSoldOut
-                            ? "w-full bg-gray-300 text-gray-500 font-bold py-2.5 px-4 rounded-full flex items-center justify-center cursor-not-allowed text-sm"
-                            : "w-full bg-green-700 text-white font-bold py-2.5 px-4 rounded-full flex items-center justify-center hover:bg-green-800 transition-colors text-sm"
+                            ? `w-full bg-gray-300 text-gray-500 font-bold px-4 rounded-full flex items-center justify-center cursor-not-allowed ${
+                                  isSmall ? "py-1.5 text-xs" : "py-2.5 text-sm"
+                              }`
+                            : `w-full bg-green-700 text-white font-bold px-4 rounded-full flex items-center justify-center hover:bg-green-800 transition-colors ${
+                                  isSmall ? "py-1.5 text-xs" : "py-2.5 text-sm"
+                              }`
                     }
                     onClick={(e) => e.stopPropagation()}
                 >
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5 mr-1"
+                        // 💡 Smaller icon
+                        className={`mr-1 ${
+                            isSmall ? "h-3.5 w-3.5" : "h-5 w-5"
+                        }`}
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"

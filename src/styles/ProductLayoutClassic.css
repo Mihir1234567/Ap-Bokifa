@@ -1,0 +1,12 @@
+/* Add these rules to your global CSS file */
+
+.cursor-custom-prev {
+    /* 1. Use your custom image cursor */
+    cursor: url('/left-arrow-svgrepo-com.png') 16 16, w-resize;
+}
+
+.cursor-custom-next {
+    /* 1. Use your custom image cursor */
+    cursor: url('/right-arrow-svgrepo-com.png') 16 16, e-resize;
+    /* 2. 'e-resize' is the fallback */
+}

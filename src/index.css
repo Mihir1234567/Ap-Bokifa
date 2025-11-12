@@ -1,8 +1,20 @@
 @import "tailwindcss";
 @plugin "daisyui";
-*{
+
+* {
     font-family: 'Manrope';
 }
-body{
+
+body {
     background-color: #f9f5f0;
+}
+
+/* Add this to your main CSS file for multi-line truncation */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    /* Sets the text to cut off exactly after the third line */
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
 }

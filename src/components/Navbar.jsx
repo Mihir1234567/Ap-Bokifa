@@ -1,3 +1,5 @@
+// components/Navbar.jsx
+
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -192,15 +194,31 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
                                 <h4 className="font-bold text-sm text-[#1D4A34] mb-3 uppercase tracking-wider">
                                     {columnTitle}
                                 </h4>
-                                {items[columnTitle].map((item) => (
-                                    <Link // Use Link
-                                        key={item.title} // Use object title
-                                        to={item.path || "#"} // Use object path
-                                        className="block text-sm text-gray-700 py-1.5 hover:text-[#3AB757]"
-                                    >
-                                        {item.title}
-                                    </Link>
-                                ))}
+                                {items[columnTitle].map((item) => {
+                                    if (item.onClick) {
+                                        return (
+                                            <button
+                                                key={item.title}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    item.onClick(e);
+                                                }}
+                                                className="block text-sm text-gray-700 py-1.5 hover:text-[#3AB757] text-left w-full"
+                                            >
+                                                {item.title}
+                                            </button>
+                                        );
+                                    }
+                                    return (
+                                        <Link // Use Link
+                                            key={item.title} // Use object title
+                                            to={item.path || "#"} // Use object path
+                                            className="block text-sm text-gray-700 py-1.5 hover:text-[#3AB757]"
+                                        >
+                                            {item.title}
+                                        </Link>
+                                    );
+                                })}
                             </div>
                         ))}
                     </div>
@@ -358,15 +376,28 @@ const MobileNestedDropdown = ({ title, items }) => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                     >
-                        {items.map((item) => (
-                            <Link // Use Link
-                                key={item.title}
-                                to={item.path || "#"} // Use 'to' and 'path'
-                                className={`block pl-4 pr-4 py-1.5 text-gray-600 hover:text-[#3AB757] hover:bg-gray-100 text-sm`}
-                            >
-                                {item.title}
-                            </Link>
-                        ))}
+                        {items.map((item) => {
+                            if (item.onClick) {
+                                return (
+                                    <button
+                                        key={item.title}
+                                        onClick={(e) => item.onClick(e)}
+                                        className={`block pl-4 pr-4 py-1.5 text-gray-600 hover:text-[#3AB757] hover:bg-gray-100 text-sm text-left w-full`}
+                                    >
+                                        {item.title}
+                                    </button>
+                                );
+                            }
+                            return (
+                                <Link // Use Link
+                                    key={item.title}
+                                    to={item.path || "#"} // Use 'to' and 'path'
+                                    className={`block pl-4 pr-4 py-1.5 text-gray-600 hover:text-[#3AB757] hover:bg-gray-100 text-sm`}
+                                >
+                                    {item.title}
+                                </Link>
+                            );
+                        })}
                     </motion.div>
                 )}
             </AnimatePresence>
@@ -489,7 +520,8 @@ const SearchDrawer = ({ onClose }) => {
                 exit={{ x: isDesktop ? "-100%" : "100%" }}
                 // ANIMATION FIX: Uses fast tween
                 transition={{ type: "tween", duration: 0.25 }}
-                className="fixed top-0 h-full bg-white shadow-lg z-[10000] w-96 max-w-full p-6 flex flex-col right-0 xl:left-0"
+                // Z-INDEX FIX: Changed z-[10000] to z-50
+                className="fixed top-0 h-full bg-white shadow-lg z-50 w-96 max-w-full p-6 flex flex-col right-0 xl:left-0"
             >
                 <div className="flex justify-between items-center pb-4 border-b">
                     <div className="relative flex-grow">
@@ -558,11 +590,12 @@ const SearchDrawer = ({ onClose }) => {
                 </div>
             </motion.div>
             {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}
+            {/* Z-INDEX FIX: Changed z-[90] to z-40 */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[90] transform"
+                className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-40 transform"
                 onClick={onClose}
             />
         </>
@@ -570,7 +603,8 @@ const SearchDrawer = ({ onClose }) => {
 };
 
 // --- Navbar (Main Component) ---
-const Navbar = () => {
+// 1. Accept the `onUpsellClick` prop
+const Navbar = ({ onUpsellClick }) => {
     // --- State and Handlers ---
     const quotes = [
         "All books at least 50% off list prices every day",
@@ -655,21 +689,28 @@ const Navbar = () => {
     const shopItems = {
         "Shop Layout": [
             { title: "Shop Left Sidebar", path: "/leftSidebar" },
-            { title: "Collection Top", path: "/" },
-            { title: "List Collection", path: "/" },
-            { title: "Coupon", path: "/" },
+            { title: "Collection Top", path: "/collections/books" },
+            { title: "List Collection", path: "/collections/categories" },
+            { title: "Coupon", path: "/couponTest" },
         ],
         "Product Layout": [
-            { title: "Product Gallery", path: "/product/gallery" },
-            { title: "Product Slider", path: "/product/slider" },
-            { title: "Product Sticky", path: "/product/sticky" },
-            { title: "Product Full Width", path: "/product/full-width" },
+            { title: "Classic", path: "/productPageClassic" },
+            { title: "Scroll Fixes", path: "/productPageScrollFixed" },
+            { title: "Left Thumbnail", path: "/productPageLeftThumbs" },
+            { title: "Right Thumbnail", path: "/productPageRightThumbs" },
+            { title: "Without Thumbnail", path: "/productPageWithoutThumbs" },
         ],
+
         "Product Type": [
-            { title: "Simple Product", path: "/product/simple" },
-            { title: "Variable Product", path: "/product/variable" },
-            { title: "External Product", path: "/product/external" },
-            { title: "Grouped Product", path: "/product/grouped" },
+            { title: "With Video", path: "/typeWithVideo" },
+            {
+                title: "Upssell",
+                path: "/product/variable",
+                onClick: (e) => onUpsellClick(e),
+            },
+            { title: "Crosssel", path: "/product/external" },
+            { title: "Soldout - In Coming", path: "/product/grouped" },
+            { title: "Product Countdown", path: "/product/grouped" },
         ],
     };
 
@@ -740,7 +781,8 @@ const Navbar = () => {
                 </div>
             )}
 
-            <header className="sticky top-0 z-50 bg-white backdrop-blur-sm shadow-sm">
+            {/* Z-INDEX FIX: Changed z-50 to z-30 */}
+            <header className="sticky top-0 z-30 bg-white backdrop-blur-sm shadow-sm">
                 {/* Main Navigation */}
                 <div className="py-6">
                     <div className="flex justify-between items-center gap-4 px-4">
@@ -851,6 +893,10 @@ const Navbar = () => {
                             >
                                 Contact
                             </Link>
+
+                            {/* --- 2. NEW LINK (DESKTOP) --- */}
+                           
+                            {/* --- END NEW LINK --- */}
                         </nav>
                         <div className="hidden xl:block text-gray-800">
                             <span>Need help? Call Us: </span>
@@ -878,7 +924,8 @@ const Navbar = () => {
                                 type: "tween",
                                 duration: 0.25,
                             }}
-                            className="fixed top-0 left-0 w-80 max-w-full h-full bg-white shadow-lg z-[1000] flex flex-col"
+                            // Z-INDEX FIX: Changed z-[100] to z-50
+                            className="fixed top-0 left-0 w-80 max-w-full h-full bg-white shadow-lg z-50 flex flex-col"
                         >
                             <div className="p-4 flex justify-end items-center border-b border-gray-200">
                                 <button onClick={() => setIsMenuOpen(false)}>
@@ -892,15 +939,17 @@ const Navbar = () => {
                                     title="Blogs"
                                     items={blogItems}
                                 />
-                                <MobileNavItem
-                                    title="Pages"
-                                    items={pagesItems}
-                                />
-                                {/* MobileNavItem handles the link internally */}
-                                <MobileNavItem title="Contact" items={[]} />
-                                <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
-                                    <Dropdown
-                                        selected={selectedCurrency}
+                                                                <MobileNavItem title="Pages" items={pagesItems} />
+                                                                {/* MobileNavItem handles the link internally */}
+                                                                <MobileNavItem title="Contact" items={[]} />
+                                
+                                                                {/* --- 3. NEW LINK (MOBILE) --- */}
+                                                               
+                                                                {/* --- END NEW LINK (MOBILE) --- */}
+                                
+                                                                <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
+                                                                    <Dropdown
+                                                                        selected={selectedCurrency}
                                         items={currencies}
                                         onSelect={setSelectedCurrency}
                                         buttonClass="text-sm px-0"
@@ -926,11 +975,12 @@ const Navbar = () => {
                             </div>
                         </motion.div>
                         {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}
+                        {/* Z-INDEX FIX: Changed z-[900] to z-40 */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[900] transform"
+                            className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-40 transform"
                             onClick={() => setIsMenuOpen(false)}
                         />
                     </>

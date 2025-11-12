@@ -118,7 +118,7 @@ export const PicksForYouSection = ({
                         <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-20">
                             {/* 1. Wishlist Icon (Heart) - PERMANENTLY VISIBLE WITH STATE */}
                             <button
-                                className="bg-white/80 backdrop-blur-sm rounded-full p-2 hover:bg-white transition-colors shadow-md"
+                                className="bg-white/80  rounded-full p-2 hover:bg-white transition-colors shadow-md"
                                 onClick={(e) => {
                                     e.stopPropagation(); // Prevents card view
                                     setIsWishlisted(!isWishlisted); // TOGGLE STATE
@@ -149,7 +149,7 @@ export const PicksForYouSection = ({
                                 {/* 2. Eye Icon (Quick View) - CONSISTENT STYLE */}
                                 <div className="relative flex items-center group/icon">
                                     <button
-                                        className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
+                                        className="bg-white/80  rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <Eye size={20} strokeWidth={2} />
@@ -162,7 +162,7 @@ export const PicksForYouSection = ({
                                 {/* 3. Compare Icon - CONSISTENT STYLE */}
                                 <div className="relative flex items-center group/icon">
                                     <button
-                                        className="bg-white/80 backdrop-blur-sm rounded-full p-2 text-green-600 hover:bg-white transition-colors shadow-md"
+                                        className="bg-white/80  rounded-full p-2 text-green-600 hover:bg-white transition-colors shadow-md"
                                         onClick={(e) => e.stopPropagation()}
                                     >
                                         <img src="/src/assets/compare.svg~" alt="" />

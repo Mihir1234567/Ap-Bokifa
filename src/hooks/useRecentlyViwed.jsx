@@ -32,13 +32,20 @@ const useRecentlyViewed = () => {
     // Function to add a product to the recently viewed list
     const addRecentlyViewed = (product) => {
         // Use updater form to compute newItems and persist immediately
+        // Compute new items using functional updater but avoid dispatching
+        // events or performing side-effects synchronously *inside* the
+        // state updater, because that can trigger other components to set
+        // state while this component is rendering. Instead, schedule the
+        // side-effects to run asynchronously after state is queued.
         setViewedItems((currentItems) => {
             const filtered = currentItems.filter(
                 (item) => item.id !== product.id
             );
             const newItems = [product, ...filtered].slice(0, MAX_ITEMS);
 
-            // Persist to localStorage synchronously to keep other tabs/windows in sync
+            // Persist to localStorage synchronously is still safe here
+            // because it's not triggering React updates. Keep it but in a
+            // try/catch to avoid breaking execution.
             try {
                 window.localStorage.setItem(
                     STORAGE_KEY,
@@ -48,15 +55,18 @@ const useRecentlyViewed = () => {
                 console.error("Error writing to local storage:", error);
             }
 
-            // Broadcast update within the same window so other components update instantly
-            try {
-                const event = new CustomEvent("recently-viewed-updated", {
-                    detail: newItems,
-                });
-                window.dispatchEvent(event);
-            } catch {
-                // If CustomEvent isn't available for some reason, ignore silently
-            }
+            // Schedule broadcast asynchronously to avoid triggering
+            // setState calls in other components during this render.
+            setTimeout(() => {
+                try {
+                    const event = new CustomEvent("recently-viewed-updated", {
+                        detail: newItems,
+                    });
+                    window.dispatchEvent(event);
+                } catch (e) {
+                    // ignore
+                }
+            }, 0);
 
             return newItems;
         });

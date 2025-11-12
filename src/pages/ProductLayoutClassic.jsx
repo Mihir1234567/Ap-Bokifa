@@ -4,7 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Slider from "react-slick";
 import ProductCarousel from "/src/components/product/ProductCorousel";
 import ALL_PRODUCTS from "/src/components/productsData";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useRecentlyViewed from "/src/hooks/useRecentlyViwed";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -339,7 +339,7 @@ Visa, MasterCard, American Express, PayPal, Diners Club, Discover, and more.
 
     return (
         <div
-            className="fixed inset-0 z-50 backdrop-blur-sm bg-black/20"
+            className="fixed inset-0 z-50 bg-black/75 "
             onClick={handleClose}
         >
             <div
@@ -1096,20 +1096,19 @@ export const ProductLayoutClassic = () => {
     const { addRecentlyViewed } = useRecentlyViewed();
 
     // Handler used by ProductCarousel / ProductCard when a product card is clicked
+    const navigate = useNavigate();
     const handleViewProduct = (product) => {
         try {
             addRecentlyViewed(product);
         } catch {
             console.error("Failed to add recently viewed");
         }
-        console.log("Viewing product:", product.title);
-        // Full reload to product page (include product id)
+        // Navigate to the product detail page (single-page navigation)
         try {
-            window.location.href = `/productPageClassic?productId=${product.id}`;
-        } catch {
-            window.location.assign(
-                `/productPageClassic?productId=${product.id}`
-            );
+            navigate(`/product/${product.id}`);
+        } catch (err) {
+            // Fallback to full location change
+            window.location.href = `/product/${product.id}`;
         }
     };
 

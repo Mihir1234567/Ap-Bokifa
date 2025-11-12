@@ -22,9 +22,11 @@ import { ProductLayoutLeftThumbs } from "./pages/ProductLayoutLeftThumbs";
 import { ProductLayoutRightThumbs } from "./pages/ProductLayoutRightThumbs";
 import { ProductLayoutWithoutThumbs } from "./pages/ProductLayoutWithoutThumbs";
 import { TypeWithVideo } from "./pages/TypeWithVideo";
+import ProductDetailPage from "./pages/ProductDetailPage"; // New import for product detail page
 
 // --- NEW IMPORTS ---
 import UpsellModal from "./components/UpsellModal"; // 1. Import the new modal
+import CrossSell from "./components/CrossSell";
 
 const App = () => {
     // 1. State to control the visibility of the coupon
@@ -33,6 +35,7 @@ const App = () => {
     // --- NEW STATE ---
     // 2. Add new state for the upsell modal
     const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
+    const [isCrossSellOpen, setIsCrossSellOpen] = useState(false);
 
     // Get current location to detect route changes
     const location = useLocation();
@@ -57,7 +60,7 @@ const App = () => {
         // This function blocks/unblocks body scrolling
         const body = document.body;
         // Check for both modals
-        if (isUpsellModalOpen || isCouponVisible) {
+        if (isUpsellModalOpen || isCrossSellOpen || isCouponVisible) {
             body.style.overflow = "hidden"; // Disable scroll
         } else {
             body.style.overflow = "auto"; // Enable scroll
@@ -67,7 +70,7 @@ const App = () => {
         return () => {
             body.style.overflow = "auto";
         };
-    }, [isUpsellModalOpen, isCouponVisible]); // 💡 Runs when *either* modal's state changes
+    }, [isUpsellModalOpen, isCrossSellOpen, isCouponVisible]); // 💡 Runs when *either* modal's state changes
 
     // 2. Function to close the coupon modal (used by the 'X' button)
     const closeCoupon = () => {
@@ -75,8 +78,12 @@ const App = () => {
     };
 
     // 4. Function for manual trigger (you can call this from any component)
-    const showCouponManually = () => {
+    const showCouponManually = (e) => {
+        if (e) e.preventDefault();
         setIsCouponVisible(true);
+    };
+    const showCrossSellManually = () => {
+        setIsCrossSellOpen(true);
     };
 
     // --- NEW FUNCTIONS ---
@@ -88,21 +95,27 @@ const App = () => {
     const closeUpsellModal = () => {
         setIsUpsellModalOpen(false);
     };
+    const openCrossSellModal = (e) => {
+        if (e) e.preventDefault(); // Prevent link navigation
+        setIsCrossSellOpen(true);
+    };
+    const closeCrossSellModal = () => {
+        setIsCrossSellOpen(false);
+    };
 
     return (
         <>
             <div className="flex flex-col min-h-screen">
                 {/* 4. Pass the open function to your Navbar */}
-                <Navbar onUpsellClick={openUpsellModal} />
+                <Navbar
+                    onUpsellClick={openUpsellModal}
+                    onCrossSellClick={openCrossSellModal}
+                    onCouponClick={showCouponManually}
+                />
 
                 <Routes>
                     {/* Your existing routes */}
                     <Route path="/" element={<Home />} />
-                    <Route
-                        path="/couponTest"
-                        // 💡 FIXED: Typo `showCouponManally` changed to `showCouponManually`
-                        element={<Home showCoupon={showCouponManually} />}
-                    />
                     <Route path="/leftSidebar" element={<BookstorePage />} />
                     <Route
                         path="/collections/categories"
@@ -134,6 +147,10 @@ const App = () => {
                         element={<ProductLayoutWithoutThumbs />}
                     />
                     <Route path="/typeWithVideo" element={<TypeWithVideo />} />
+                    <Route
+                        path="/product/:productId"
+                        element={<ProductDetailPage />}
+                    />
                 </Routes>
 
                 <RecentlyViewedSidebar />
@@ -147,6 +164,7 @@ const App = () => {
             {/* --- NEW RENDER --- */}
             {/* 6. Conditionally Render the Upsell Modal */}
             {isUpsellModalOpen && <UpsellModal onClose={closeUpsellModal} />}
+            {isCrossSellOpen && <CrossSell onClose={closeCrossSellModal} />}
         </>
     );
 };

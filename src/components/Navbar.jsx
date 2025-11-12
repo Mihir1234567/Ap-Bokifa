@@ -589,13 +589,12 @@ const SearchDrawer = ({ onClose }) => {
                     </div>
                 </div>
             </motion.div>
-            {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}
             {/* Z-INDEX FIX: Changed z-[90] to z-40 */}
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-40 transform"
+                className="fixed inset-0 backdrop-filter bg-black/75 z-40 transform"
                 onClick={onClose}
             />
         </>
@@ -604,7 +603,7 @@ const SearchDrawer = ({ onClose }) => {
 
 // --- Navbar (Main Component) ---
 // 1. Accept the `onUpsellClick` prop
-const Navbar = ({ onUpsellClick }) => {
+const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
     // --- State and Handlers ---
     const quotes = [
         "All books at least 50% off list prices every day",
@@ -691,7 +690,7 @@ const Navbar = ({ onUpsellClick }) => {
             { title: "Shop Left Sidebar", path: "/leftSidebar" },
             { title: "Collection Top", path: "/collections/books" },
             { title: "List Collection", path: "/collections/categories" },
-            { title: "Coupon", path: "/couponTest" },
+            { title: "Coupon", onClick: (e) => onCouponClick(e) },
         ],
         "Product Layout": [
             { title: "Classic", path: "/productPageClassic" },
@@ -708,7 +707,7 @@ const Navbar = ({ onUpsellClick }) => {
                 path: "/product/variable",
                 onClick: (e) => onUpsellClick(e),
             },
-            { title: "Crosssel", path: "/product/external" },
+            { title: "Crosssel", path: "/product/external", onClick: (e) => onCrossSellClick(e) },
             { title: "Soldout - In Coming", path: "/product/grouped" },
             { title: "Product Countdown", path: "/product/grouped" },
         ],
@@ -782,7 +781,7 @@ const Navbar = ({ onUpsellClick }) => {
             )}
 
             {/* Z-INDEX FIX: Changed z-50 to z-30 */}
-            <header className="sticky top-0 z-30 bg-white backdrop-blur-sm shadow-sm">
+            <header className="sticky top-0 z-30 bg-white bg-black/75 shadow-sm">
                 {/* Main Navigation */}
                 <div className="py-6">
                     <div className="flex justify-between items-center gap-4 px-4">
@@ -895,7 +894,7 @@ const Navbar = ({ onUpsellClick }) => {
                             </Link>
 
                             {/* --- 2. NEW LINK (DESKTOP) --- */}
-                           
+
                             {/* --- END NEW LINK --- */}
                         </nav>
                         <div className="hidden xl:block text-gray-800">
@@ -939,17 +938,20 @@ const Navbar = ({ onUpsellClick }) => {
                                     title="Blogs"
                                     items={blogItems}
                                 />
-                                                                <MobileNavItem title="Pages" items={pagesItems} />
-                                                                {/* MobileNavItem handles the link internally */}
-                                                                <MobileNavItem title="Contact" items={[]} />
-                                
-                                                                {/* --- 3. NEW LINK (MOBILE) --- */}
-                                                               
-                                                                {/* --- END NEW LINK (MOBILE) --- */}
-                                
-                                                                <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
-                                                                    <Dropdown
-                                                                        selected={selectedCurrency}
+                                <MobileNavItem
+                                    title="Pages"
+                                    items={pagesItems}
+                                />
+                                {/* MobileNavItem handles the link internally */}
+                                <MobileNavItem title="Contact" items={[]} />
+
+                                {/* --- 3. NEW LINK (MOBILE) --- */}
+
+                                {/* --- END NEW LINK (MOBILE) --- */}
+
+                                <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
+                                    <Dropdown
+                                        selected={selectedCurrency}
                                         items={currencies}
                                         onSelect={setSelectedCurrency}
                                         buttonClass="text-sm px-0"
@@ -974,13 +976,12 @@ const Navbar = ({ onUpsellClick }) => {
                                 </Link>
                             </div>
                         </motion.div>
-                        {/* OVERLAY FIX: Restored blur and added 'transform' for GPU acceleration */}
-                        {/* Z-INDEX FIX: Changed z-[900] to z-40 */}
+ {/* Z-INDEX FIX: Changed z-[900] to z-40 */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-40 transform"
+                            className="fixed inset-0 backdrop-filter bg-black/75 z-40 transform"
                             onClick={() => setIsMenuOpen(false)}
                         />
                     </>

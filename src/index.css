@@ -18,3 +18,16 @@ body {
     line-clamp: 3;
     -webkit-line-clamp: 3;
 }
+
+a,
+button,
+[role="button"],
+[onclick],
+select,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+input[type="checkbox"],
+input[type="radio"] {
+    cursor: pointer;
+}

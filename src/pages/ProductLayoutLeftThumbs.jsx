@@ -16,7 +16,6 @@ import {
 // Import react-slick styles
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "/src/styles/ProductLayoutLeftThumbs.css";
 
 const CustomAnimatedDropdown = ({
     formatOptions,
@@ -339,10 +338,7 @@ Visa, MasterCard, American Express, PayPal, Diners Club, Discover, and more.
     };
 
     return (
-        <div
-            className="fixed inset-0 z-50 backdrop-blur-sm bg-black/20"
-            onClick={handleClose}
-        >
+        <div className="fixed inset-0 z-50 bg-black/75" onClick={handleClose}>
             <div
                 className={`fixed right-0 top-0 w-[110] md:w-[440px] h-full bg-white shadow-2xl overflow-y-auto transform transition-transform duration-300 ease-in-out ${sidebarClasses}`}
                 onClick={(e) => e.stopPropagation()}

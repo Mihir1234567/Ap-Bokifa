@@ -12,8 +12,17 @@ export const Coupon = ({ onClose }) => {
         alert("Coupon code copied to clipboard!");
     };
 
+    const handleBackdropClick = (e) => {
+        if (e.target === e.currentTarget) {
+            onClose();
+        }
+    };
+
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center">
+        <div
+            className="fixed inset-0 bg-black/50 z-50 flex justify-center items-center"
+            onClick={handleBackdropClick}
+        >
             {/* 2. **Content Box**: Added 'relative' positioning for the close button */}
             <div className="w-[470px] h-[170px] flex justify-center items-center bg-white rounded-lg shadow-xl relative">
                 {/* 3. **The Close Button ("X")** */}

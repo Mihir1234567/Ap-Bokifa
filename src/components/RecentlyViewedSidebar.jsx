@@ -162,7 +162,7 @@ const RecentlyViewedSidebar = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             // Using a high z-index to overlay content, consistent with Navbar sidebars
-                            className="fixed inset-0 backdrop-filter backdrop-blur-sm bg-opacity-30 z-[900]"
+                            className="fixed inset-0 backdrop-filter bg-black/75 z-[900]"
                             onClick={closeSidebar}
                         />
 

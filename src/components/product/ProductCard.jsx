@@ -1,6 +1,7 @@
 // ProductCard.jsx
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // StarRating component remains unchanged
 const StarRating = ({ rating, reviewCount, variant = "default" }) => {
@@ -45,13 +46,23 @@ const StarRating = ({ rating, reviewCount, variant = "default" }) => {
 
 const ProductCard = ({ product, onViewProduct, variant = "default" }) => {
     const [isWishlisted, setIsWishlisted] = useState(false);
+    const navigate = useNavigate();
 
     const isSmall = variant === "small";
+
+    const handleCardClick = () => {
+        // First, call the onViewProduct callback (for recently viewed tracking)
+        if (onViewProduct) {
+            onViewProduct(product);
+        }
+        // Then navigate to the product detail page
+        navigate(`/product/${product.id}`);
+    };
 
     return (
         <div
             className="group flex flex-col flex-shrink-0 w-full bg-white rounded-xl shadow-none hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 ease-in-out cursor-pointer"
-            onClick={() => onViewProduct(product)} // 検 Calls the update function
+            onClick={handleCardClick} // 検 Updated to navigate to product detail page
         >
             <div className="relative rounded-t-xl ">
                 <img

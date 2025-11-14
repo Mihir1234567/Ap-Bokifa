@@ -1,7 +1,29 @@
-// ProductCard.jsx
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useCurrency } from "../../context/CurrencyContext";
+
+// --- Currency Conversion Utility ---
+const CONVERSION_RATES = {
+    "USD $": { rate: 1, symbol: "$" },
+    "EUR €": { rate: 0.92, symbol: "€" },
+    "GBP £": { rate: 0.79, symbol: "£" },
+    "CAD C$": { rate: 1.37, symbol: "C$" },
+    "AUD A$": { rate: 1.52, symbol: "A$" },
+    "JPY ¥": { rate: 157.45, symbol: "¥" },
+    "CNY ¥": { rate: 7.25, symbol: "¥" },
+    "INR ₹": { rate: 83.55, symbol: "₹" },
+    "BRL R$": { rate: 5.46, symbol: "R$" },
+    "MXN $": { rate: 18.42, symbol: "$" },
+};
+
+const getFormattedPrice = (price, currency) => {
+    const conversion = CONVERSION_RATES[currency];
+    if (!conversion) {
+        return `$${price.toFixed(2)}`; // Fallback to USD
+    }
+    const convertedPrice = price * conversion.rate;
+    return `${conversion.symbol}${convertedPrice.toFixed(2)}`;
+};
 
 // StarRating component remains unchanged
 const StarRating = ({ rating, reviewCount, variant = "default" }) => {
@@ -47,6 +69,7 @@ const StarRating = ({ rating, reviewCount, variant = "default" }) => {
 const ProductCard = ({ product, onViewProduct, variant = "default" }) => {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const navigate = useNavigate();
+    const { currency } = useCurrency();
 
     const isSmall = variant === "small";
 
@@ -246,7 +269,7 @@ const ProductCard = ({ product, onViewProduct, variant = "default" }) => {
                               }`
                     }
                 >
-                    ${product.price}
+                    {getFormattedPrice(product.price, currency)}
                 </p>
             </div>
 

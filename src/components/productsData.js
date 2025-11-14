@@ -10,6 +10,7 @@ const ALL_PRODUCTS = [
         rating: 0,
         reviewCount: 0,
         discount: 15,
+        saleEndDate: "2025-11-20T23:59:59", // 🚀 Timer added
         imageUrl: "/src/assets/the_wedding.webp",
         currentBestselling: false,
         isHighlight: true,
@@ -183,6 +184,7 @@ const ALL_PRODUCTS = [
         rating: 0,
         reviewCount: 0,
         discount: 15,
+        saleEndDate: "2025-11-17T18:00:00", // 🚀 Timer added
         imageUrl: "/src/assets/ENTITLEMENT.webp",
         currentBestselling: true,
         isHighlight: false,
@@ -441,7 +443,7 @@ const ALL_PRODUCTS = [
         isPickForYou: true,
         category: "Fantasy",
         format: "Ebook",
-        dateAdded: new Date("2023-09-01"),
+        dateAdded: new Date("2Z023-09-01"),
     },
     {
         id: 24,

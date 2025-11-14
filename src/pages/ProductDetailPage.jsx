@@ -1,11 +1,15 @@
 // ProductDetailPage.jsx - Uses ProductLayoutClassic Design with Dynamic Product Data
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import Slider from "react-slick";
 import ALL_PRODUCTS from "/src/components/productsData";
 import useRecentlyViewed from "/src/hooks/useRecentlyViwed";
 import ProductCarousel from "/src/components/product/ProductCorousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import StickyBottomBar from "/src/components/product/StickyBottomBar";
+import CountdownTimer from "/src/components/product/CountdownTimer.jsx"; // 🚀 ADD THIS IMPORT
+import { FORMAT_MULTIPLIERS } from "/src/constants";
+import { useCurrency } from "/src/context/CurrencyContext";
 import {
     faFacebookF,
     faTwitter,
@@ -15,13 +19,26 @@ import {
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-// Format multipliers and dynamic price calculation
-// We compute prices per format from the product's base price and discount
-const FORMAT_MULTIPLIERS = {
-    Hardcover: 1.15,
-    Paperback: 1.0,
-    Ebook: 0.6,
-    "Audio cd": 1.1,
+const CONVERSION_RATES = {
+    "USD $": { rate: 1, symbol: "$" },
+    "EUR €": { rate: 0.92, symbol: "€" },
+    "GBP £": { rate: 0.79, symbol: "£" },
+    "CAD C$": { rate: 1.37, symbol: "C$" },
+    "AUD A$": { rate: 1.52, symbol: "A$" },
+    "JPY ¥": { rate: 157.45, symbol: "¥" },
+    "CNY ¥": { rate: 7.25, symbol: "¥" },
+    "INR ₹": { rate: 83.55, symbol: "₹" },
+    "BRL R$": { rate: 5.46, symbol: "R$" },
+    "MXN $": { rate: 18.42, symbol: "$" },
+};
+
+const getFormattedPrice = (price, currency) => {
+    const conversion = CONVERSION_RATES[currency];
+    if (!conversion) {
+        return `$${price.toFixed(2)}`; // Fallback to USD
+    }
+    const convertedPrice = price * conversion.rate;
+    return `${conversion.symbol}${convertedPrice.toFixed(2)}`;
 };
 
 const normalizeFormatKey = (format) =>
@@ -30,9 +47,17 @@ const normalizeFormatKey = (format) =>
         .toLowerCase();
 
 // Given a product and a selected format, return pricing details
-const getPriceDetails = (product, selectedFormat) => {
+const getPriceDetails = (product, selectedFormat, currency) => {
     if (!product) {
-        return { originalPrice: 0, finalPrice: 0, discount: 0, discountPct: 0 };
+        return {
+            originalPrice: 0,
+            finalPrice: 0,
+            discount: 0,
+            discountPct: 0,
+            formattedOriginalPrice: getFormattedPrice(0, currency),
+            formattedFinalPrice: getFormattedPrice(0, currency),
+            formattedDiscount: getFormattedPrice(0, currency),
+        };
     }
 
     // Try direct match first, otherwise normalize and match
@@ -57,6 +82,9 @@ const getPriceDetails = (product, selectedFormat) => {
         finalPrice,
         discount: discountAmount,
         discountPct,
+        formattedOriginalPrice: getFormattedPrice(originalPrice, currency),
+        formattedFinalPrice: getFormattedPrice(finalPrice, currency),
+        formattedDiscount: getFormattedPrice(discountAmount, currency),
     };
 };
 
@@ -598,69 +626,7 @@ const PaymentOptions = () => (
         />
     </div>
 );
-// Sticky Bottom Bar Component (adapted from ProductLayoutClassic)
-const StickyBottomBar = ({
-    isVisible,
-    product,
-    selectedFormat,
-    onFormatChange,
-    priceDetails,
-}) => {
-    const formatOptions = Object.keys(FORMAT_MULTIPLIERS);
-    const { finalPrice } = priceDetails || { finalPrice: 0 };
 
-    const productTitle = product?.title || "";
-
-    return (
-        <div
-            className={`fixed bottom-0 left-0 right-0 w-full bg-white shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] transform transition-transform duration-300 ease-in-out z-40 ${
-                isVisible ? "translate-y-0" : "translate-y-full"
-            }`}
-        >
-            <div className="max-w-8xl mx-auto px-5 sm:px-6 lg:px-18">
-                <div className="flex items-center justify-between h-auto md:h-20 py-4 md:py-0 flex-col md:flex-row gap-4 md:gap-0">
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <img
-                            src={product?.imageUrl}
-                            alt={product?.title}
-                            className="w-12 h-auto rounded-md flex-shrink-0"
-                        />
-                        <div className="flex-grow">
-                            <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
-                                {productTitle}
-                            </h3>
-                            <span className="text-sm font-semibold text-gray-700">
-                                ${finalPrice.toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <div className="relative w-1/2 md:w-auto">
-                            <select
-                                value={selectedFormat}
-                                onChange={(e) => onFormatChange(e.target.value)}
-                                className="appearance-none rounded-md border border-gray-300 py-2 pl-3 pr-10 text-sm focus:border-green-500 focus:outline-none focus:ring-green-500"
-                            >
-                                {formatOptions.map((f) => (
-                                    <option key={f} value={f}>
-                                        {f}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <button
-                            className="bg-black text-white font-bold py-2 px-6 rounded-full hover:bg-gray-800 transition-colors whitespace-nowrap w-1/2 md:w-auto"
-                            onClick={() => console.log("Added from sticky bar")}
-                        >
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 const StarRating = ({ rating, reviewCount }) => {
     const filledStars = Math.floor(rating || 0);
     const displayReviewCount = reviewCount === undefined ? 0 : reviewCount;
@@ -742,17 +708,7 @@ const ImageModal = ({ images = [], startIndex = 0, onClose }) => {
                 &times;
             </button>
 
-            <button
-                className="absolute left-4 md:left-10 text-gray-800 text-3xl md:text-4xl font-bold bg-white shadow-lg rounded-full h-10 w-10 flex items-center justify-center hover:bg-gray-100 active:scale-95 transition"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    prevImage();
-                }}
-                aria-label="Previous image"
-            >
-                &#8592;
-            </button>
-
+            
             <div
                 className="max-w-[95vw] max-h-[90vh] flex items-center justify-center px-6"
                 onClick={(e) => e.stopPropagation()}
@@ -764,16 +720,7 @@ const ImageModal = ({ images = [], startIndex = 0, onClose }) => {
                 />
             </div>
 
-            <button
-                className="absolute right-4 md:right-10 text-gray-800 text-3xl md:text-4xl font-bold bg-white shadow-lg rounded-full h-10 w-10 flex items-center justify-center hover:bg-gray-100 active:scale-95 transition"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    nextImage();
-                }}
-                aria-label="Next image"
-            >
-                &#8594;
-            </button>
+           
 
             <div className="absolute bottom-6 text-gray-600 text-sm opacity-80 select-none">
                 {currentIndex + 1} / {images.length}
@@ -786,6 +733,7 @@ const ProductDetailPage = () => {
     const { productId } = useParams();
     const navigate = useNavigate();
     const { addRecentlyViewed } = useRecentlyViewed();
+    const { currency } = useCurrency();
 
     // States - ALL HOOKS MUST BE AT THE TOP
     const [product, setProduct] = useState(null);
@@ -841,6 +789,11 @@ const ProductDetailPage = () => {
         if (foundProduct) {
             setProduct(foundProduct);
             setSelectedFormat(foundProduct.format || "Hardcover");
+            setSelectedImageIndex(0);
+            setEnlargedImageUrl(null);
+            setActiveTab("Description");
+            setIsReviewFormVisible(false);
+            setReviewSubmitted(false);
 
             // Defer broadcasting recently viewed to avoid triggering
             // cross-component updates during the same render cycle.
@@ -861,7 +814,7 @@ const ProductDetailPage = () => {
         } else {
             navigate("/");
         }
-    }, [productId, navigate, addRecentlyViewed]);
+    }, [productId, navigate]);
 
     // Sticky bar visibility - show when addToCartRef is scrolled out of view
     // *** THIS IS THE MOVED BLOCK ***
@@ -901,10 +854,19 @@ const ProductDetailPage = () => {
     const thumbnailUrls = [product.imageUrl];
 
     // Get price details dynamically from product and selected format
-    const currentPriceDetails = getPriceDetails(product, selectedFormat);
-    const price = currentPriceDetails.finalPrice;
-    const originalPrice = currentPriceDetails.originalPrice;
-    const saveAmount = currentPriceDetails.discount;
+    const currentPriceDetails = getPriceDetails(
+        product,
+        selectedFormat,
+        currency
+    );
+    const {
+        formattedFinalPrice,
+        formattedOriginalPrice,
+        formattedDiscount,
+        finalPrice,
+        originalPrice,
+        discount,
+    } = currentPriceDetails;
 
     // Related products (filter by highlight)
     const relatedProductIds = ALL_PRODUCTS.filter(
@@ -967,6 +929,7 @@ const ProductDetailPage = () => {
     };
 
     const handleViewProduct = (product) => {
+        addRecentlyViewed(product);
         navigate(`/product/${product.id}`);
     };
 
@@ -1026,6 +989,7 @@ const ProductDetailPage = () => {
                 selectedFormat={selectedFormat}
                 onFormatChange={handleFormatClick}
                 priceDetails={currentPriceDetails}
+                currency={currency}
             />
 
             {/* Breadcrumbs */}
@@ -1055,29 +1019,7 @@ const ProductDetailPage = () => {
                             </Slider>
 
                             {/* Navigation Overlay - Left */}
-                            <div
-                                className="absolute top-0 left-0 w-1/2 h-full z-10 cursor-pointer flex items-center justify-start group"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    mainImageSliderRef.current?.slickPrev();
-                                }}
-                                aria-label="Previous image"
-                            >
-                                <div className="absolute top-0 left-0 w-full h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-r from-black/80 to-transparent rounded-l-lg" />
-                            </div>
-
-                            {/* Navigation Overlay - Right */}
-                            <div
-                                className="absolute top-0 right-0 w-1/2 h-full z-10 cursor-pointer flex items-center justify-end group"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    mainImageSliderRef.current?.slickNext();
-                                }}
-                                aria-label="Next image"
-                            >
-                                <div className="absolute top-0 right-0 w-1/2 h-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-l from-black/80 to-transparent rounded-r-lg" />
-                            </div>
-
+                        
                             {/* Zoom Icon */}
                             <div
                                 className="absolute bottom-4 right-4 w-10 h-10 rounded-full bg-white/80 flex items-center justify-center shadow-md cursor-zoom-in z-20"
@@ -1135,17 +1077,21 @@ const ProductDetailPage = () => {
 
                         <div className="flex items-center space-x-4 my-4 text-sm">
                             <div className="flex items-center text-green-700">
-                                <svg
-                                    className="w-4 h-4 mr-1"
-                                    fill="currentColor"
-                                    viewBox="0 0 20 20"
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
+                                {product.isSoldOut === false ? (
+                                    <svg
+                                        className="w-4 h-4 mr-1"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                ) : (
+                                    ""
+                                )}
                                 <span>
                                     {product.isSoldOut
                                         ? "Out of Stock"
@@ -1159,24 +1105,50 @@ const ProductDetailPage = () => {
                         {/* Price Block */}
                         <div className="flex items-center space-x-3 mb-6 py-4">
                             <h2 className="text-4xl font-bold text-green-700">
-                                ${price.toFixed(2)}
+                                {formattedFinalPrice}
                             </h2>
-                            {originalPrice > price && (
+                            {originalPrice > finalPrice && (
                                 <span className="text-2xl text-gray-400 line-through">
-                                    ${originalPrice.toFixed(2)}
+                                    {formattedOriginalPrice}
                                 </span>
                             )}
-                            {saveAmount > 0 && (
+                            {discount > 0 && (
                                 <span className="px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
-                                    Save ${saveAmount.toFixed(2)}
+                                    Save {formattedDiscount}
+                                </span>
+                            )}
+                            {product.isSoldOut && (
+                                <span className="px-2 py-1 bg-gray-400 text-white text-xs font-semibold rounded-full">
+                                    Sold Out
                                 </span>
                             )}
                         </div>
-
+                        {product.saleEndDate && (
+                            <CountdownTimer saleEndDate={product.saleEndDate} />
+                        )}
                         <div className="text-gray-700 mb-8">
                             <p className="line-clamp-3">
-                                {product.description ||
-                                    "High-quality product with excellent features."}
+                                From the author of The Longest Ride and The
+                                Return comes a novel about the enduring legacy
+                                of first love, and the decisions that haunt us
+                                forever. 1996 was the year that changed
+                                everything for Maggie Dawes. Sent away at
+                                sixteen to live with an aunt she barely knew in
+                                Ocracoke, a remote village on North Carolina's
+                                Outer Banks, she could think only of the friends
+                                and family she left behind . . . until she met
+                                Bryce Trickett, one of the few teenagers on the
+                                island. Handsome, genuine, and newly admitted to
+                                West Point, Bryce showed her how much there was
+                                to love about the wind-swept beach town--and
+                                introduced her to photography, a passion that
+                                would define the rest of her life. A collection
+                                of 10 well-researched board books to introduce a
+                                wide range of learning topics and everyday
+                                objects to the little scholars. The topics
+                                included in the set are - ABC, Numbers, Shapes,
+                                Colours, Wild Animals, Farm Animals and Pets,
+                                Birds, Fruits, Vegetables and Transport.
                             </p>
                         </div>
 
@@ -1199,6 +1171,11 @@ const ProductDetailPage = () => {
                                                 format === selectedFormat
                                                     ? "bg-gray-900 text-white"
                                                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                                            }
+                                            ${
+                                                product.isSoldOut
+                                                    ? "opacity-50 cursor-not-allowed"
+                                                    : "cursor-pointer"
                                             }`}
                                             onClick={() =>
                                                 handleFormatClick(format)
@@ -1249,27 +1226,40 @@ const ProductDetailPage = () => {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="flex w-full max-w-lg space-x-4">
-                                <button
-                                    className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
-                                    onClick={() =>
-                                        console.log(
-                                            `Added ${qtyValue} of "${product.title}" to cart`
-                                        )
-                                    }
-                                >
-                                    Add to Cart
-                                </button>
+                            {product.isSoldOut === false ? (
+                                <div className="flex w-full max-w-lg space-x-4">
+                                    <button
+                                        className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
+                                        onClick={() =>
+                                            console.log(
+                                                `Added ${qtyValue} of "${product.title}" to cart`
+                                            )
+                                        }
+                                    >
+                                        Add to Cart
+                                    </button>
 
-                                <button
-                                    className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
-                                    onClick={() =>
-                                        console.log(`Buy Now ${qtyValue} items`)
-                                    }
-                                >
-                                    Buy It Now
-                                </button>
-                            </div>
+                                    <button
+                                        className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
+                                        onClick={() =>
+                                            console.log(
+                                                `Buy Now ${qtyValue} items`
+                                            )
+                                        }
+                                    >
+                                        Buy It Now
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex w-full max-w-lg space-x-4">
+                                    <button
+                                        className="flex-1 bg-gray-400 text-white font-bold py-3 px-6 rounded-full cursor-not-allowed shadow-md text-lg"
+                                        disabled
+                                    >
+                                        Sold Out
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {/* Wishlist & Compare Links */}

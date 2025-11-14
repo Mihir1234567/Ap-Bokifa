@@ -8,6 +8,9 @@ import ALL_PRODUCTS from "/src/components/productsData";
 import { Link } from "react-router-dom";
 import useRecentlyViewed from "/src/hooks/useRecentlyViwed";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import StickyBottomBar from "/src/components/product/StickyBottomBar";
+// 🚀 FORMAT_MULTIPLIERS is now aliased as formatPrices
+import { FORMAT_MULTIPLIERS as formatPrices } from "/src/constants";
 import {
     faFacebookF,
     faTwitter,
@@ -22,29 +25,49 @@ import "slick-carousel/slick/slick-theme.css";
 const mainProductId = 12; // "ABSOLUTION"
 const mainProduct = ALL_PRODUCTS.find((p) => p.id === mainProductId);
 
-// 🚨 Price data structure based on user's request
-const formatPrices = {
-    Hardcover: {
-        originalPrice: 392.0,
-        finalPrice: 392.0,
-        discount: 0.0,
-    },
-    Paperback: {
-        originalPrice: 56.0,
-        finalPrice: 47.0,
-        discount: 9.0,
-    },
-    Ebook: {
-        originalPrice: 67.0,
-        finalPrice: 47.0,
-        discount: 20.0,
-    },
-    "Audio cd": {
-        originalPrice: 94.0,
-        finalPrice: 47.0,
-        discount: 47.0,
-    },
+// 🚀 --- CORRECTED: Price calculation logic from ProductDetailPage.jsx ---
+const normalizeFormatKey = (format) =>
+    String(format)
+        .replace(/[^a-z0-9]/gi, "")
+        .toLowerCase();
+
+// Given a product and a selected format, return pricing details
+const getPriceDetails = (product, selectedFormat) => {
+    if (!product) {
+        return { originalPrice: 0, finalPrice: 0, discount: 0, discountPct: 0 };
+    }
+
+    // Try direct match first, otherwise normalize and match
+    const pickFormat =
+        Object.keys(formatPrices).find((f) => f === selectedFormat) ||
+        Object.keys(formatPrices).find(
+            (f) => normalizeFormatKey(f) === normalizeFormatKey(selectedFormat)
+        ) ||
+        Object.keys(formatPrices)[0]; // Fallback to first format
+
+    const multiplier = formatPrices[pickFormat] ?? 1;
+
+    // 🚀 FIX: Use product.price as the BASE undiscounted price
+    const base = Number(product.price ?? 0);
+
+    // 🚀 FIX: Calculate originalPrice from the base * multiplier
+    const originalPrice = +(base * multiplier);
+
+    // product.discount is percentage (e.g., 15)
+    const discountPct = Number(product.discount) || 0;
+
+    // Calculate final price (apply discount to the format-adjusted original price)
+    const finalPrice = +(originalPrice * (1 - discountPct / 100));
+    const discountAmount = +(originalPrice - finalPrice);
+
+    return {
+        originalPrice,
+        finalPrice,
+        discount: discountAmount,
+        discountPct,
+    };
 };
+// 🚀 --- END: Corrected Price calculation logic ---
 
 // Image URLs for the thumbnail gallery (6 items)
 const thumbnailUrls = [
@@ -995,82 +1018,15 @@ const CustomAnimatedDropdown = ({
     );
 };
 
-// 🚀 --- NEW: Sticky Bottom Bar Component ---
-const StickyBottomBar = ({
-    isVisible,
-    product,
-    selectedFormat,
-    onFormatChange,
-    priceDetails,
-    formatOptions, // 🚀 NEW: Added formatOptions prop
-}) => {
-    // Get the final price from the passed priceDetails prop
-    const { finalPrice } = priceDetails;
-
-    // Use the main product title
-    const productTitle =
-        "Complete Set of 7 Books: 30 Days to Change Yourself - Don't Be Perfect, Be Happy";
-
-    return (
-        <div
-            className={`fixed bottom-0 left-0 right-0 w-full bg-white shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] 
-                        transform transition-transform duration-300 ease-in-out z-40
-                        ${isVisible ? "translate-y-0" : "translate-y-full"}`}
-        >
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* On small screens (mobile), stack items vertically or in a simplified row.
-                  On medium and larger screens, use the layout from the image.
-                */}
-                <div className="flex items-center justify-between h-auto md:h-20 py-4 md:py-0 flex-col md:flex-row gap-4 md:gap-0">
-                    {/* Left: Image, Title, Price */}
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <img
-                            src={product.imageUrl}
-                            alt={product.title}
-                            className="w-12 h-auto rounded-md flex-shrink-0"
-                        />
-                        <div className="flex-grow">
-                            <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
-                                {productTitle}
-                            </h3>
-                            <span className="text-sm font-semibold text-gray-700">
-                                ${finalPrice.toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Right: Format Selector, Button */}
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        {/* 🚀 --- NEW: Replaced <select> with custom animated dropdown --- */}
-                        <CustomAnimatedDropdown
-                            formatOptions={formatOptions}
-                            selectedFormat={selectedFormat}
-                            onFormatChange={onFormatChange}
-                        />
-
-                        <button
-                            className="bg-black text-white font-bold py-2 px-6 rounded-md
-                                       hover:bg-gray-800 transition-colors whitespace-nowrap w-1/2 md:w-auto"
-                            // Add your cart logic here
-                            onClick={() => console.log("Added from sticky bar")}
-                        >
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 // --- Component Definition ---
 export const ProductLayoutScrollFixed = () => {
     // 🚀 --- NEW: Local Storage Key for Reviews ---
     const LOCAL_STORAGE_KEY = `productReviews_${mainProductId}`;
 
-    // State to manage the selected image index and selected format
-    // 🚨 REMOVED: selectedImageIndex (no longer needed for main slider)
-    const [selectedFormat, setSelectedFormat] = useState("Audio cd");
+    // 🚀 --- MODIFIED: State for format ---
+    const [selectedFormat, setSelectedFormat] = useState(
+        mainProduct?.format || "Audio cd"
+    );
     const [activeTab, setActiveTab] = useState("Description");
 
     // 🚀 --- NEW: State to manage review form visibility and success message ---
@@ -1150,15 +1106,15 @@ export const ProductLayoutScrollFixed = () => {
     const [isStickyBarVisible, setIsStickyBarVisible] = useState(false);
     const addToCartRef = useRef(null); // Ref to attach to the main "Add to Cart" button group
 
-    // Get current price details based on selected format
-    const currentPriceDetails =
-        formatPrices[selectedFormat] || formatPrices["Audio cd"];
+    // --- 🚀 FINAL FIX: Use getPriceDetails function ---
+    const isMissing = !mainProduct;
 
+    // Get price details using the new function
+    const currentPriceDetails = getPriceDetails(mainProduct, selectedFormat);
     const price = currentPriceDetails.finalPrice;
     const originalPrice = currentPriceDetails.originalPrice;
-
-    const isMissing = !mainProduct;
     const saveAmount = currentPriceDetails.discount;
+    // --- END FIX ---
 
     // 🚀 --- NEW: useEffect to handle scroll for sticky bar ---
     useEffect(() => {
@@ -1247,8 +1203,8 @@ export const ProductLayoutScrollFixed = () => {
                 </li>
                 <span>/</span>
                 <li className=" text-gray-700">
-                    Complete Set of 7 Books: 30 Days to Change Yourself - Don't
-                    Be Perfect, Be Happy{" "}
+                    {/* 🚀 MODIFIED: Use mainProduct.title */}
+                    {mainProduct.title}
                 </li>
             </ol>
         </nav>
@@ -1303,7 +1259,7 @@ export const ProductLayoutScrollFixed = () => {
                 selectedFormat={selectedFormat}
                 onFormatChange={handleFormatClick} // Pass the handler
                 priceDetails={currentPriceDetails}
-                formatOptions={Object.keys(formatPrices)} // Pass the options
+                formatOptions={Object.keys(formatPrices || {})} // 🚀 Added fallback for formatPrices
             />
             {isMissing ? (
                 <div className="text-center py-20">Product not found.</div>
@@ -1337,8 +1293,8 @@ export const ProductLayoutScrollFixed = () => {
                             {/* 🚀 ADDED lg:sticky */}
                             <div className="lg:w-1/2 lg:sticky lg:top-8">
                                 <h1 className="text-4xl font-serif font-light text-gray-900 mb-2">
-                                    Complete Set of 7 Books: 30 Days to Change
-                                    Yourself - Don't Be Perfect, Be Happy
+                                    {/* 🚀 MODIFIED: Use mainProduct.title */}
+                                    {mainProduct.title}
                                 </h1>
                                 <StarRating
                                     rating={5}
@@ -1385,7 +1341,8 @@ export const ProductLayoutScrollFixed = () => {
                                 <div className="text-gray-700 mb-8">
                                     {/* 🚀 IMPLEMENTATION: Added 'line-clamp-3' to shorten text and add '...' */}
                                     <p className="line-clamp-3">
-                                        From the author of The Longest Ride and
+                                        {mainProduct.description ||
+                                            `From the author of The Longest Ride and
                                         The Return comes a novel about the
                                         enduring legacy of first love, and the
                                         decisions that haunt us forever. 1996
@@ -1402,15 +1359,7 @@ export const ProductLayoutScrollFixed = () => {
                                         how much there was to love about the
                                         wind-swept beach town--and introduced
                                         her to photography, a passion that would
-                                        define the rest of her life. A
-                                        collection of 10 well-researched board
-                                        books to introduce a wide range of
-                                        learning topics and everyday objects to
-                                        the little scholars. The topics included
-                                        in the set are - ABC, Numbers, Shapes,
-                                        Colours, Wild Animals, Farm Animals and
-                                        Pets, Birds, Fruits, Vegetables and
-                                        Transport.
+                                        define the rest of her life.`}
                                     </p>
                                 </div>
                                 <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
@@ -1423,7 +1372,7 @@ export const ProductLayoutScrollFixed = () => {
                                         </span>
                                     </label>
                                     <div className="flex space-x-3">
-                                        {Object.keys(formatPrices).map(
+                                        {Object.keys(formatPrices || {}).map(
                                             (format) => (
                                                 <button
                                                     key={format}
@@ -1639,7 +1588,8 @@ export const ProductLayoutScrollFixed = () => {
                                 // ... (Description Content)
                                 <div>
                                     <p className="mb-4">
-                                        From the author of The Longest Ride and
+                                        {mainProduct.description ||
+                                            `From the author of The Longest Ride and
                                         The Return comes a novel about the
                                         enduring legacy of first love, and the
                                         decisions that haunt us forever. 1996
@@ -1651,7 +1601,7 @@ export const ProductLayoutScrollFixed = () => {
                                         only of the friends and family she left
                                         behind . . . until she met Bryce
                                         Trickett, one of the few teenagers on
-                                        the island.
+                                        the island.`}
                                     </p>
                                     <p>
                                         Handsome, genuine, and newly admitted to
@@ -1912,3 +1862,6 @@ export const ProductLayoutScrollFixed = () => {
         </div>
     );
 };
+
+// 🚀 MODIFIED: Export 'ProductLayoutScrollFixed' as default
+export default ProductLayoutScrollFixed;

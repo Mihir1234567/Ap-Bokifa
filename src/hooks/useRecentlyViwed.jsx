@@ -1,6 +1,6 @@
 // src/hooks/useRecentlyViwed.jsx
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 const STORAGE_KEY = "recentlyViewedItems";
 const MAX_ITEMS = 5; // Limits the number of items stored
@@ -30,7 +30,7 @@ const useRecentlyViewed = () => {
     }, [viewedItems]);
 
     // Function to add a product to the recently viewed list
-    const addRecentlyViewed = (product) => {
+    const addRecentlyViewed = useCallback((product) => {
         // Use updater form to compute newItems and persist immediately
         // Compute new items using functional updater but avoid dispatching
         // events or performing side-effects synchronously *inside* the
@@ -70,7 +70,7 @@ const useRecentlyViewed = () => {
 
             return newItems;
         });
-    };
+    }, []);
 
     // 🌟 NEW: Helper boolean for conditional rendering
     const hasViewedItems = viewedItems.length > 0;

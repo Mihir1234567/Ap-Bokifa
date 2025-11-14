@@ -7,6 +7,8 @@ import ALL_PRODUCTS from "/src/components/productsData";
 import { Link } from "react-router-dom";
 import useRecentlyViewed from "/src/hooks/useRecentlyViwed";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import StickyBottomBar from "/src/components/product/StickyBottomBar";
+import { FORMAT_MULTIPLIERS as formatPrices } from "/src/constants";
 import {
     faFacebookF,
     faTwitter,
@@ -122,29 +124,7 @@ const CustomAnimatedDropdown = ({
 const mainProductId = 12; // "Redemption Echo" - matching user's visual example
 const mainProduct = ALL_PRODUCTS.find((p) => p.id === mainProductId);
 
-// 🚨 Price data structure based on user's request
-const formatPrices = {
-    Hardcover: {
-        originalPrice: 392.0,
-        finalPrice: 392.0,
-        discount: 0.0,
-    },
-    Paperback: {
-        originalPrice: 56.0,
-        finalPrice: 47.0,
-        discount: 9.0,
-    },
-    Ebook: {
-        originalPrice: 67.0,
-        finalPrice: 47.0,
-        discount: 20.0,
-    },
-    "Audio cd": {
-        originalPrice: 94.0,
-        finalPrice: 47.0,
-        discount: 47.0,
-    },
-};
+
 
 // Image URLs for the thumbnail gallery (6 items)
 const thumbnailUrls = [
@@ -998,76 +978,7 @@ const DeliveryInfo = () => (
     </div>
 );
 
-// 🚀 --- NEW: Sticky Bottom Bar Component ---
-const StickyBottomBar = ({
-    isVisible,
-    product,
-    selectedFormat,
-    onFormatChange,
-    priceDetails,
-}) => {
-    // Get all available format options from the main price data
-    const formatOptions = Object.keys(formatPrices);
-    // Get the final price from the passed priceDetails prop
-    const { finalPrice } = priceDetails;
 
-    // Use the main product title
-    const productTitle =
-        "Complete Set of 7 Books: 30 Days to Change Yourself - Don't Be Perfect, Be Happy";
-
-    return (
-        <div
-            className={`fixed bottom-0 left-0 right-0 w-full bg-white shadow-[-2px_-2px_10px_rgba(0,0,0,0.1)] 
-                        transform transition-transform duration-300 ease-in-out z-40
-                        ${isVisible ? "translate-y-0" : "translate-y-full"}`}
-        >
-            <div className="max-w-8xl mx-auto px-5 sm:px-6 lg:px-18">
-                {/* On small screens (mobile), stack items vertically or in a simplified row.
-                  On medium and larger screens, use the layout from the image.
-                */}
-                <div className="flex items-center justify-between h-auto md:h-20 py-4 md:py-0 flex-col md:flex-row gap-4 md:gap-0">
-                    {/* Left: Image, Title, Price */}
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        <img
-                            src={product.imageUrl}
-                            alt={product.title}
-                            className="w-12 h-auto rounded-md flex-shrink-0"
-                        />
-                        <div className="flex-grow">
-                            <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
-                                {productTitle}
-                            </h3>
-                            <span className="text-sm font-semibold text-gray-700">
-                                ${finalPrice.toFixed(2)}
-                            </span>
-                        </div>
-                    </div>
-
-                    {/* Right: Format Selector, Button */}
-                    <div className="flex items-center gap-4 w-full md:w-auto">
-                        {/* Replicating the dropdown from the image */}
-                        <div className="relative w-1/2 md:w-auto">
-                            {/* 🚀 --- NEW: Replaced <select> with custom animated dropdown --- */}
-                            <CustomAnimatedDropdown
-                                formatOptions={formatOptions}
-                                selectedFormat={selectedFormat}
-                                onFormatChange={onFormatChange}
-                            />
-                        </div>
-                        <button
-                            className="bg-black text-white font-bold py-2 px-6 rounded-full
-                                       hover:bg-gray-800 transition-colors whitespace-nowrap w-1/2 md:w-auto"
-                            // Add your cart logic here
-                            onClick={() => console.log("Added from sticky bar")}
-                        >
-                            Add To Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 // --- Component Definition ---
 

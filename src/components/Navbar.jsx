@@ -148,12 +148,35 @@ const Dropdown = ({ selected, items, onSelect, buttonClass, menuClass }) => {
 };
 
 // --- NavDropdown (Hover-based) ---
+// components/Navbar.jsx
+
+// --- NavDropdown (Hover-based) ---
 const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
     const [isOpen, setIsOpen] = useState(false);
     const isDesktop = useIsDesktop();
     const isMegaMenu = !Array.isArray(items);
 
+    // --- START: Fix for sticky/fixed gap (v2) ---
+    const navDropdownRef = useRef(null); // Ref for the parent wrapper
+    const buttonRef = useRef(null); // <-- NEW: Ref for the button itself
+    const [dropdownTop, setDropdownTop] = useState(0); // State to hold the top position
+
+    const handleMouseEnter = () => {
+        // <-- MODIFIED: Measure the button, not the wrapper
+        if (isMegaMenu && buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect(); // <-- Measure the button
+            setDropdownTop(rect.bottom);
+        }
+        setIsOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsOpen(false);
+    };
+    // --- END: Fix for sticky/fixed gap ---
+
     const renderMenuContent = () => {
+        // ... (This entire function remains unchanged) ...
         if (isMegaMenu) {
             if (title === "Home" && items.layouts) {
                 return (
@@ -273,15 +296,15 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
         ? `fixed left-0 right-0 w-full border-b border-gray-200`
         : `absolute top-full left-0 w-48 border-b border-gray-200`;
 
-    const fixedTopClass = isMegaMenu ? "top-[]" : "";
-
     return (
         <div
             className="relative"
-            onMouseEnter={() => setIsOpen(true)}
-            onMouseLeave={() => setIsOpen(false)}
+            onMouseEnter={handleMouseEnter} // Use the new handler
+            onMouseLeave={handleMouseLeave} // Use the new handler
+            ref={navDropdownRef} // This ref is for the parent div
         >
             <button
+                ref={buttonRef} // <-- NEW: Add the buttonRef here
                 className={`flex items-center py-4 text-gray-800 font-medium hover:text-[#3AB757] ${buttonClass}`}
             >
                 {title} <ChevronDownIcon />
@@ -296,10 +319,12 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
                         y: isOpen ? 0 : -10,
                         visibility: isOpen ? "visible" : "hidden",
                     }}
+                    // Apply the calculated top position using an inline style
+                    style={isMegaMenu ? { top: `${dropdownTop}px` } : {}}
                     transition={{ duration: 0.2 }}
                     className={`mt-0 bg-white shadow-xl z-10 
                                 overflow-y-auto max-h-[70vh] 
-                                ${dropdownClasses} ${fixedTopClass} ${menuClass}`}
+                                ${dropdownClasses} ${menuClass}`}
                 >
                     {/* UNIFIED GREEN BORDER: Apply green border for all dropdowns here */}
                     <div className="h-0.5 bg-[#3AB757] w-full"></div>
@@ -601,6 +626,8 @@ const SearchDrawer = ({ onClose }) => {
     );
 };
 
+import { useCurrency } from "../context/CurrencyContext";
+
 // --- Navbar (Main Component) ---
 // 1. Accept the `onUpsellClick` prop
 const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
@@ -621,7 +648,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
         setCurrentIndex((prev) => (prev - 1 + quotes.length) % quotes.length);
     const currentQuote = quotes[currentIndex];
 
-    const [selectedCurrency, setSelectedCurrency] = useState("USD $");
+    const { currency, changeCurrency } = useCurrency();
     const [selectedLanguage, setSelectedLanguage] = useState("ENGLISH");
 
     const currencies = [
@@ -707,9 +734,13 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
                 path: "/product/variable",
                 onClick: (e) => onUpsellClick(e),
             },
-            { title: "Crosssel", path: "/product/external", onClick: (e) => onCrossSellClick(e) },
-            { title: "Soldout - In Coming", path: "/product/grouped" },
-            { title: "Product Countdown", path: "/product/grouped" },
+            {
+                title: "Crosssel",
+                path: "/product/external",
+                onClick: (e) => onCrossSellClick(e),
+            },
+            { title: "Soldout - In Coming", path: "/product/21" },
+            { title: "Product Countdown", path: "/product/1" },
         ],
     };
 
@@ -834,9 +865,9 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
                             {/* Currency/Language */}
                             <div className="flex items-center space-x-2 sm:space-x-4 text-sm text-gray-600">
                                 <Dropdown
-                                    selected={selectedCurrency}
+                                    selected={currency}
                                     items={currencies}
-                                    onSelect={setSelectedCurrency}
+                                    onSelect={changeCurrency}
                                     buttonClass="text-sm"
                                     menuClass="mt-2 w-32"
                                 />
@@ -951,9 +982,9 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
 
                                 <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
                                     <Dropdown
-                                        selected={selectedCurrency}
+                                        selected={currency}
                                         items={currencies}
-                                        onSelect={setSelectedCurrency}
+                                        onSelect={changeCurrency}
                                         buttonClass="text-sm px-0"
                                         menuClass="w-32"
                                     />
@@ -976,7 +1007,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
                                 </Link>
                             </div>
                         </motion.div>
- {/* Z-INDEX FIX: Changed z-[900] to z-40 */}
+                        {/* Z-INDEX FIX: Changed z-[900] to z-40 */}
                         <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}

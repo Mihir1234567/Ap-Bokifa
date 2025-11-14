@@ -1,5 +1,3 @@
-// src/components/RecentlyViewedSidebar.jsx
-
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // NEW: Import motion and AnimatePresence
 import useRecentlyViewed from "../hooks/useRecentlyViwed";
@@ -57,6 +55,7 @@ const RecentlyViewedSidebar = () => {
                 const nextIndex = (prevIndex + 1) % itemCount;
 
                 // 1. Start the fade-out of the old image by setting the 'last' state
+                // Ensure we have a valid item to set as lastTopItem
                 setLastTopItem(viewedItems[prevIndex]);
 
                 // 2. Set isFading to true to apply the starting opacity (0) to the new image
@@ -97,7 +96,7 @@ const RecentlyViewedSidebar = () => {
                             {" "}
                             {/* Added a relative container */}
                             {/* Back and Middle items remain subtle (Unchanged) */}
-                            {backItem && (
+                            {backItem && backItem.id && ( // Ensure backItem and its id exist
                                 <img
                                     key={backItem.id}
                                     src={backItem.imageUrl}
@@ -105,7 +104,7 @@ const RecentlyViewedSidebar = () => {
                                     className="absolute w-2/3 h-2/3 object-cover rounded-full z-10 opacity-70 transform -translate-x-1 translate-y-1"
                                 />
                             )}
-                            {middleItem && (
+                            {middleItem && middleItem.id && ( // Ensure middleItem and its id exist
                                 <img
                                     key={middleItem.id}
                                     src={middleItem.imageUrl}
@@ -114,8 +113,9 @@ const RecentlyViewedSidebar = () => {
                                 />
                             )}
                             {/* NEW: Old image is displayed underneath and will visually "fade out" */}
-                            {lastTopItem && (
+                            {lastTopItem && lastTopItem.id && ( // Ensure lastTopItem and its id exist
                                 <img
+                                    key={lastTopItem.id}
                                     src={lastTopItem.imageUrl}
                                     alt={lastTopItem.title}
                                     // The old image provides the background while the new one fades in
@@ -123,9 +123,9 @@ const RecentlyViewedSidebar = () => {
                                 />
                             )}
                             {/* Top Item: This is the NEW item that fades IN */}
-                            {topItem && (
+                            {topItem && topItem.id && ( // Ensure topItem and its id exist
                                 <img
-                                    key={topItem.id}
+                                    key={topItem.id} // This key is crucial for React to re-render
                                     src={topItem.imageUrl}
                                     alt={topItem.title}
                                     // Key classes for fade: opacity-0 when starting fade, transition-opacity for animation
@@ -141,8 +141,9 @@ const RecentlyViewedSidebar = () => {
                         </div>
                     ) : (
                         // ** SINGLE IMAGE VIEW (itemCount is 1 or shouldRotate is false) **
-                        topItem && (
+                        topItem && topItem.id && ( // Ensure topItem and its id exist
                             <img
+                                key={topItem.id} // Ensure key is present here too
                                 src={topItem.imageUrl}
                                 alt={topItem.title}
                                 className="w-full h-full object-cover"

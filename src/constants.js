@@ -10,3 +10,10 @@ export const SORT_OPTIONS = [
     { value: "date-asc", label: "Date, old to new" },
     { value: "date-desc", label: "Date, new to old" },
 ];
+
+export const FORMAT_MULTIPLIERS = {
+    Hardcover: 1.15,
+    Paperback: 1.0,
+    Ebook: 0.6,
+    "Audio cd": 1.1,
+};

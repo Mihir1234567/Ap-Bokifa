@@ -31,6 +31,10 @@ import BlogPage from "./pages/BlogPage_Grid";
 import BlogPageList from "./pages/BlogPage_Standard";
 import BlogPostDetailWithSidebar from "./pages/BlogPage";
 import AboutSection from "./pages/AboutUs";
+import ContactPage from "./pages/ContactPage";
+import MeetOurTeam from "./pages/OurTeam";
+import NotFoundPage from "./pages/PageNotFound";
+import LookBook from "./pages/LookBook";
 
 const App = () => {
   // 1. State to control the visibility of the coupon
@@ -151,12 +155,16 @@ const App = () => {
             path="/blog/post/:postId"
             element={
               <BlogPostDetailWithSidebar
-              onSearchClick={() => console.log("Search clicked")}
+                onSearchClick={() => console.log("Search clicked")}
               />
             }
           />
-            <Route path="/about" element={<AboutSection />} />
-            
+          <Route path="/about" element={<AboutSection />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/our-team" element={<MeetOurTeam />} />
+          <Route path="/PageNotFound" element={<NotFoundPage />} />
+          <Route path="/LookBook" element={<LookBook />} />
+          <Route path="/*" element={<NotFoundPage />} />
         </Routes>
 
         <RecentlyViewedSidebar />

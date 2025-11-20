@@ -752,9 +752,10 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
     const pagesItems = [
         { title: "About Us", path: "/about" },
         { title: "Contact", path: "/contact" },
-        { title: "Our Team", path: "/team" },
+        { title: "Our Team", path: "/our-team" },
         { title: "FAQs", path: "/faqs" },
         { title: "LookBook", path: "/lookbook" },
+        { title: "404", path: "/PageNotFound" },
     ];
 
     const userMenuItems = [

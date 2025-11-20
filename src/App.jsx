@@ -30,6 +30,7 @@ import CrossSell from "./components/CrossSell";
 import BlogPage from "./pages/BlogPage_Grid";
 import BlogPageList from "./pages/BlogPage_Standard";
 import BlogPostDetailWithSidebar from "./pages/BlogPage";
+import AboutSection from "./pages/AboutUs";
 
 const App = () => {
   // 1. State to control the visibility of the coupon
@@ -150,11 +151,11 @@ const App = () => {
             path="/blog/post/:postId"
             element={
               <BlogPostDetailWithSidebar
-                onSearchClick={() => console.log("Search clicked")}
+              onSearchClick={() => console.log("Search clicked")}
               />
             }
           />
-          {/* Add other routes for testing if needed */}
+            <Route path="/about" element={<AboutSection />} />
             
         </Routes>
 

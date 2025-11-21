@@ -1,3 +1,4 @@
+/* d:/Projects/Ap-Bokifa-main/src/components/CategoryBanner.jsx */
 // src/components/product/CategoryBanner.jsx
 
 import React from "react";

@@ -1,28 +1,18 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  Home,
-  Instagram,
-  ChevronLeft,
-  ChevronRight,
-  X,
-  ChevronUp,
-  ShoppingBag,
-} from "lucide-react";
+import { Home, Instagram, X, ChevronUp, Minus, Plus } from "lucide-react";
 import Slider from "react-slick";
 import ProductCard from "../components/product/ProductCard";
 import ProductCarousel from "../components/product/ProductCorousel";
 import ALL_PRODUCTS from "../components/productsData";
 import { useCurrency } from "../context/CurrencyContext";
-
-// 1. IMPORT THE CONSTANTS
-// Make sure this path points to where you saved the file you just shared
+import QuickViewDrawer from "../components/QuickViewDrawer";
 import { FORMAT_MULTIPLIERS } from "../constants";
 
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
-// --- CURRENCY RATES (Matching ProductDetailPage) ---
+// --- CURRENCY RATES ---
 const CONVERSION_RATES = {
   "USD $": { rate: 1, symbol: "$" },
   "EUR €": { rate: 0.92, symbol: "€" },
@@ -60,17 +50,16 @@ const getPriceDetails = (product, selectedFormat, currency) => {
     ) ||
     Object.keys(FORMAT_MULTIPLIERS)[0];
 
-  // Get multiplier (e.g., 1.15 for Hardcover)
+  // Get multiplier (e.g., 1.15 for Hardcover, 1.0 for Paperback)
   const multiplier = FORMAT_MULTIPLIERS[pickFormat] ?? 1;
   const base = Number(product.price ?? 0);
 
-  // 1. Apply Multiplier (Base * 1.15)
+  // 1. Apply Multiplier
   const originalPrice = +(base * multiplier);
 
   // 2. Apply Discount
   const discountPct = Number(product.discount) || 0;
   const finalPrice = +(originalPrice * (1 - discountPct / 100));
-  const discountAmount = +(originalPrice - finalPrice);
 
   return {
     originalPrice,
@@ -83,6 +72,8 @@ const getPriceDetails = (product, selectedFormat, currency) => {
 };
 
 const LookBook = () => {
+  const [activeProduct, setActiveProduct] = useState(null);
+
   const navigate = useNavigate();
   const { currency } = useCurrency();
 
@@ -97,14 +88,14 @@ const LookBook = () => {
   const [isHotspotOpen, setIsHotspotOpen] = useState(false);
 
   // --- Product State ---
-  // Default to "Hardcover" to trigger the 1.15x multiplier immediately
-  const [selectedFormat, setSelectedFormat] = useState("Hardcover");
+  // FIX: Changed default to "Paperback" (Multiplier 1.0) to match Product Card price
+  const [selectedFormat, setSelectedFormat] = useState("Paperback");
   const [quantity, setQuantity] = useState(1);
 
   // --- Data Setup ---
-  const hotspotProduct = ALL_PRODUCTS[19] || {}; // Ensure this ID exists in your data
+  const hotspotProduct = ALL_PRODUCTS[19] || {};
 
-  // Calculate Price dynamically
+  // Calculate Price dynamically based on selectedFormat
   const priceDetails = getPriceDetails(
     hotspotProduct,
     selectedFormat,
@@ -137,7 +128,7 @@ const LookBook = () => {
     { type: "image", src: "/src/assets/AboutUsIgImg2.png" },
     { type: "image", src: "/src/assets/AboutUsIgImg3.png" },
     { type: "image", src: "/src/assets/AboutUsIgImg4.png" },
-    ];
+  ];
 
   // --- Effects ---
   useEffect(() => {
@@ -340,18 +331,21 @@ const LookBook = () => {
 
                     {/* Desktop Price (Using Calculated Values) */}
                     <div className="flex items-center gap-2 mb-2">
-                      <p className="text-[#008040] font-bold text-xl">
-                        {priceDetails?.formattedFinalPrice}
-                      </p>
-                     
+                      {priceDetails ? (
+                        <p className="text-[#008040] font-bold text-xl">
+                          {priceDetails.formattedFinalPrice}
+                        </p>
+                      ) : (
+                        <p className="text-[#008040] font-bold text-xl">...</p>
+                      )}
                     </div>
 
-                    <a
-                      href={`/product/${hotspotProduct.id}`}
-                      className=" text-gray-400 underline hover:text-gray-600 transition-colors"
+                    <button
+                      onClick={() => setActiveProduct(hotspotProduct)}
+                      className=" text-gray-400 underline hover:text-gray-600 transition-colors text-sm"
                     >
                       Quick view
-                    </a>
+                    </button>
                   </div>
                 </div>
               )}
@@ -385,7 +379,8 @@ const LookBook = () => {
                   <ProductCard
                     product={product}
                     variant="small"
-                    showStars={true}
+                    onQuickView={() => setActiveProduct(product)}
+                    // Using default behavior of ProductCard which shows base price
                   />
                 </div>
               ))}
@@ -537,7 +532,7 @@ const LookBook = () => {
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   className="w-10 h-full flex items-center justify-center text-xl text-gray-500 hover:bg-gray-50"
                 >
-                  -
+                  <Minus size={16} />
                 </button>
                 <div className="flex-1 h-full flex items-center justify-center text-gray-900 font-medium">
                   {quantity}
@@ -546,7 +541,7 @@ const LookBook = () => {
                   onClick={() => setQuantity(quantity + 1)}
                   className="w-10 h-full flex items-center justify-center text-xl text-gray-500 hover:bg-gray-50"
                 >
-                  +
+                  <Plus size={16} />
                 </button>
               </div>
             </div>
@@ -562,6 +557,11 @@ const LookBook = () => {
           </button>
         </div>
       </div>
+      <QuickViewDrawer
+        isOpen={!!activeProduct}
+        onClose={() => setActiveProduct(null)}
+        product={activeProduct}
+      />
     </div>
   );
 };

@@ -1,3 +1,4 @@
+/* d:/Projects/Ap-Bokifa-main/src/components/BlogData.js */
 // This file exports your blog post data.
 // All posts now include the rich 'content' structure (paragraphs, quotes, grids).
 

@@ -1,3 +1,4 @@
+/* d:/Projects/Ap-Bokifa-main/src/components/Coupon.jsx */
 import React, { useState } from "react";
 
 // 1. Accept the onClose function as a prop

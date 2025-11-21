@@ -1,3 +1,4 @@
+/* d:/Projects/Ap-Bokifa-main/src/App.jsx */
 // App.jsx
 
 import React, { useState, useEffect } from "react";
@@ -152,6 +153,7 @@ const App = () => {
           <Route path="/typeWithVideo" element={<TypeWithVideo />} />
           <Route path="/product/:productId" element={<ProductDetailPage />} />
           <Route path="/blog/grid" element={<BlogPage />} />
+          <Route path="/blog/standard" element={<BlogPageList />} />
           <Route
             path="/blog/post/:postId"
             element={

@@ -1,3 +1,4 @@
+/* d:/Projects/Ap-Bokifa-main/src/components/Footer.jsx */
 import React, { useState, useEffect } from "react";
 import { IoIosArrowUp } from "react-icons/io";
 

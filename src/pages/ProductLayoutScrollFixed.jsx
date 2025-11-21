@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import useRecentlyViewed from "/src/hooks/useRecentlyViwed";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StickyBottomBar from "/src/components/product/StickyBottomBar";
+import QuickViewDrawer from "/src/components/QuickViewDrawer";
 // 🚀 FORMAT_MULTIPLIERS is now aliased as formatPrices
 import { FORMAT_MULTIPLIERS as formatPrices } from "/src/constants";
 import {
@@ -1022,6 +1023,7 @@ const CustomAnimatedDropdown = ({
 export const ProductLayoutScrollFixed = () => {
     // 🚀 --- NEW: Local Storage Key for Reviews ---
     const LOCAL_STORAGE_KEY = `productReviews_${mainProductId}`;
+const [quickViewProduct, setQuickViewProduct] = useState(null);
 
     // 🚀 --- MODIFIED: State for format ---
     const [selectedFormat, setSelectedFormat] = useState(
@@ -1238,111 +1240,105 @@ export const ProductLayoutScrollFixed = () => {
     };
 
     return (
-        <div className="min-h-screen bg-white">
-            {/* 🚀 Image Modal (Updated Logic) */}
-            {modalConfig && (
-                <ImageModal
-                    images={modalConfig.images}
-                    startIndex={modalConfig.startIndex}
-                    onClose={() => setModalConfig(null)}
-                />
-            )}
-            {/* 🚀 Sidebar Modal */}
-            <SidebarModal
-                contentId={sidebarContent}
-                onClose={() => setSidebarContent(null)}
-            />
-            {/* 🚀 --- NEW: Render Sticky Bottom Bar --- */}
-            <StickyBottomBar
-                isVisible={isStickyBarVisible}
-                product={mainProduct}
-                selectedFormat={selectedFormat}
-                onFormatChange={handleFormatClick} // Pass the handler
-                priceDetails={currentPriceDetails}
-                formatOptions={Object.keys(formatPrices || {})} // 🚀 Added fallback for formatPrices
-            />
-            {isMissing ? (
-                <div className="text-center py-20">Product not found.</div>
-            ) : (
-                <>
-                    {/* 1. Breadcrumbs */}
-                    <Breadcrumbs />
-                    {/* Main Product Details Section */}
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-4">
-                        {/* 🚀 MODIFIED: Layout container + ADDED lg:items-start */}
-                        <div className="flex flex-col lg:flex-row gap-12 bg-white rounded-lg lg:items-start">
-                            {/* 🚀 MODIFIED: Image Gallery (50% width) - NORMAL SCROLL */}
-                            <div className="lg:w-1/2 flex flex-col items-center">
-                                {/* 🚀 MODIFIED: Removed sticky/max-h/overflow properties */}
-                                <div className="w-full flex flex-col gap-4">
-                                    {thumbnailUrls.map((url, index) => (
-                                        <img
-                                            key={index}
-                                            src={url}
-                                            alt={`Product view ${index + 1}`}
-                                            className="w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
-                                            onClick={() =>
-                                                handleProductImageClick(index)
-                                            }
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+      <div className="min-h-screen bg-white">
+        {/* 🚀 Image Modal (Updated Logic) */}
+        {modalConfig && (
+          <ImageModal
+            images={modalConfig.images}
+            startIndex={modalConfig.startIndex}
+            onClose={() => setModalConfig(null)}
+          />
+        )}
+        {/* 🚀 Sidebar Modal */}
+        <SidebarModal
+          contentId={sidebarContent}
+          onClose={() => setSidebarContent(null)}
+        />
+        {/* 🚀 --- NEW: Render Sticky Bottom Bar --- */}
+        <StickyBottomBar
+          isVisible={isStickyBarVisible}
+          product={mainProduct}
+          selectedFormat={selectedFormat}
+          onFormatChange={handleFormatClick} // Pass the handler
+          priceDetails={currentPriceDetails}
+          formatOptions={Object.keys(formatPrices || {})} // 🚀 Added fallback for formatPrices
+        />
+        {isMissing ? (
+          <div className="text-center py-20">Product not found.</div>
+        ) : (
+          <>
+            {/* 1. Breadcrumbs */}
+            <Breadcrumbs />
+            {/* Main Product Details Section */}
+            <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 py-4">
+              {/* 🚀 MODIFIED: Layout container + ADDED lg:items-start */}
+              <div className="flex flex-col lg:flex-row gap-12 bg-white rounded-lg lg:items-start">
+                {/* 🚀 MODIFIED: Image Gallery (50% width) - NORMAL SCROLL */}
+                <div className="lg:w-1/2 flex flex-col items-center">
+                  {/* 🚀 MODIFIED: Removed sticky/max-h/overflow properties */}
+                  <div className="w-full flex flex-col gap-4">
+                    {thumbnailUrls.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Product view ${index + 1}`}
+                        className="w-full h-auto object-cover rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => handleProductImageClick(index)}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-                            {/* 🚀 MODIFIED: Product Information (50% width) - STICKY */}
-                            {/* 🚀 ADDED lg:sticky */}
-                            <div className="lg:w-1/2 lg:sticky lg:top-8">
-                                <h1 className="text-4xl font-serif font-light text-gray-900 mb-2">
-                                    {/* 🚀 MODIFIED: Use mainProduct.title */}
-                                    {mainProduct.title}
-                                </h1>
-                                <StarRating
-                                    rating={5}
-                                    reviewCount={reviews.length}
-                                />
-                                <div className="flex items-center space-x-4 my-4 text-sm">
-                                    <div className="flex items-center text-green-700">
-                                        <svg
-                                            className="w-4 h-4 mr-1"
-                                            fill="currentColor"
-                                            viewBox="0 0 20 20"
-                                        >
-                                            <path
-                                                fillRule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                clipRule="evenodd"
-                                            />
-                                        </svg>
-                                        <span>In Stock</span>
-                                    </div>
-                                </div>
-                                <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
-                                {/* Dynamic Price Block */}
-                                <div className="flex items-center space-x-3 mb-6 py-4">
-                                    <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+                {/* 🚀 MODIFIED: Product Information (50% width) - STICKY */}
+                {/* 🚀 ADDED lg:sticky */}
+                <div className="lg:w-1/2 lg:sticky lg:top-8">
+                  <h1 className="text-4xl font-serif font-light text-gray-900 mb-2">
+                    {/* 🚀 MODIFIED: Use mainProduct.title */}
+                    {mainProduct.title}
+                  </h1>
+                  <StarRating rating={5} reviewCount={reviews.length} />
+                  <div className="flex items-center space-x-4 my-4 text-sm">
+                    <div className="flex items-center text-green-700">
+                      <svg
+                        className="w-4 h-4 mr-1"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span>In Stock</span>
+                    </div>
+                  </div>
+                  <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+                  {/* Dynamic Price Block */}
+                  <div className="flex items-center space-x-3 mb-6 py-4">
+                    <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
 
-                                    <h2 className="text-4xl font-bold text-green-700">
-                                        {/* Display Final Price */}$
-                                        {price.toFixed(2)}
-                                    </h2>
-                                    {originalPrice > price && (
-                                        <span className="text-2xl text-gray-400 line-through">
-                                            {/* Display Original Price only if a discount exists */}
-                                            ${originalPrice.toFixed(2)}
-                                        </span>
-                                    )}
-                                    {saveAmount > 0 && (
-                                        <span className="px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
-                                            {/* Display Savings only if a discount exists */}
-                                            Save ${saveAmount.toFixed(2)}
-                                        </span>
-                                    )}
-                                </div>
-                                <div className="text-gray-700 mb-8">
-                                    {/* 🚀 IMPLEMENTATION: Added 'line-clamp-3' to shorten text and add '...' */}
-                                    <p className="line-clamp-3">
-                                        {mainProduct.description ||
-                                            `From the author of The Longest Ride and
+                    <h2 className="text-4xl font-bold text-green-700">
+                      {/* Display Final Price */}${price.toFixed(2)}
+                    </h2>
+                    {originalPrice > price && (
+                      <span className="text-2xl text-gray-400 line-through">
+                        {/* Display Original Price only if a discount exists */}
+                        ${originalPrice.toFixed(2)}
+                      </span>
+                    )}
+                    {saveAmount > 0 && (
+                      <span className="px-2 py-1 bg-red-600 text-white text-xs font-semibold rounded">
+                        {/* Display Savings only if a discount exists */}
+                        Save ${saveAmount.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-gray-700 mb-8">
+                    {/* 🚀 IMPLEMENTATION: Added 'line-clamp-3' to shorten text and add '...' */}
+                    <p className="line-clamp-3">
+                      {mainProduct.description ||
+                        `From the author of The Longest Ride and
                                         The Return comes a novel about the
                                         enduring legacy of first love, and the
                                         decisions that haunt us forever. 1996
@@ -1360,236 +1356,214 @@ export const ProductLayoutScrollFixed = () => {
                                         wind-swept beach town--and introduced
                                         her to photography, a passion that would
                                         define the rest of her life.`}
-                                    </p>
-                                </div>
-                                <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
-                                {/* Format Selector */}
-                                <div className="mb-8">
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        FORMAT:{" "}
-                                        <span className="font-bold">
-                                            {selectedFormat.toUpperCase()}
-                                        </span>
-                                    </label>
-                                    <div className="flex space-x-3">
-                                        {Object.keys(formatPrices || {}).map(
-                                            (format) => (
-                                                <button
-                                                    key={format}
-                                                    className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                                                        format ===
-                                                        selectedFormat
-                                                            ? "bg-gray-900 text-white"
-                                                            : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                                                    }`}
-                                                    onClick={() =>
-                                                        handleFormatClick(
-                                                            format
-                                                        )
-                                                    }
-                                                >
-                                                    {format}
-                                                </button>
-                                            )
-                                        )}
-                                    </div>
-                                </div>
-                                <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
-
-                                {/* ⭐️ MODIFIED: Quantity and Action Buttons - Centered */}
-                                {/* 🚀 --- NEW: Attached ref to this div --- */}
-                                <div
-                                    className="flex flex-row gap-5 justify-center items-center space-y-4 mb-6"
-                                    ref={addToCartRef}
-                                >
-                                    {/* Quantity Selector - Centered */}
-                                    <div className="flex mt-5 items-center border border-gray-300 rounded-lg">
-                                        <button
-                                            onClick={minusminus}
-                                            className="px-3 py-2.5 text-black hover:bg-gray-50 rounded-l-lg"
-                                        >
-                                            -
-                                        </button>
-                                        <input
-                                            type="number"
-                                            defaultValue="1"
-                                            value={qtyValue}
-                                            min="1"
-                                            className="w-12 text-center border-gray-300 text-black"
-                                        />
-                                        <button
-                                            onClick={plusplus}
-                                            className="px-3 py-2.5 text-gray-500 hover:bg-gray-50 rounded-r-lg"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-
-                                    {/* Action Buttons - Centered as a Group, Spanning a max width */}
-                                    <div className="flex w-full max-w-lg space-x-4">
-                                        <button
-                                            // ⭐️ HOVER CHANGE: from hover:bg-green-800 to hover:bg-green-600
-                                            className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
-                                            onClick={() =>
-                                                console.log("Added set to cart")
-                                            }
-                                        >
-                                            Add to Cart
-                                        </button>
-
-                                        <button
-                                            // ⭐️ HOVER CHANGE: from hover:bg-green-800 to hover:bg-green-600
-                                            className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
-                                            onClick={() =>
-                                                console.log("Buy It Now")
-                                            }
-                                        >
-                                            Buy It Now
-                                        </button>
-                                    </div>
-                                </div>
-                                {/* <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" /> */}
-
-                                {/* Wishlist & Compare Links */}
-                                <div className="flex items-center justify-center space-x-6 text-sm mb-6 w-full">
-                                    <button className="flex  items-center text-gray-600 hover:text-gray-900">
-                                        <img
-                                            src="/src/assets/heart.svg"
-                                            className="w-4 h-4 opacity-100 mr-1"
-                                            alt=""
-                                        />
-                                        Add To Wishlist
-                                    </button>
-                                    <button className="flex items-center text-gray-600 hover:text-gray-900">
-                                        <img
-                                            src="/src/assets/compare.svg"
-                                            className="w-4 h-4 opacity-70 mr-1"
-                                            alt=""
-                                        />
-                                        Add To Compare
-                                    </button>
-                                </div>
-                                <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
-                                {/* Delivery Info */}
-                                <DeliveryInfo />
-                                {/* Payment Options */}
-                                <PaymentOptions />
-                                {/* Categories & Tags */}
-                                <div className="mt-6 text-s text-gray-500">
-                                    <p>
-                                        <strong>Categories:</strong> Books,
-                                        Books New, Fantasy, Fiction, Kids Books,
-                                        Non Fiction
-                                    </p>
-                                    <p className="mt-2">
-                                        <strong>Tags:</strong> Ebook
-                                    </p>
-                                </div>
-                                {/* Social Icons */}
-                                <div className="flex items-center space-x-3 mt-6">
-                                    {/* Facebook - Blue-600 */}
-                                    <a
-                                        href="#"
-                                        aria-label="Share on Facebook"
-                                        className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center transition-colors hover:bg-blue-700"
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={faFacebookF}
-                                            className="w-4 h-4"
-                                        />
-                                    </a>
-                                    {/* Twitter (X) - Sky-500 (Using old blue color as per your original request, but updated Font Awesome icon for X) */}
-                                    <a
-                                        href="#"
-                                        aria-label="Share on X (Twitter)"
-                                        className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center transition-colors hover:bg-sky-600"
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={faTwitter}
-                                            className="w-4 h-4"
-                                        />
-                                    </a>
-                                    {/* Pinterest - Red-600 */}
-                                    <a
-                                        href="#"
-                                        aria-label="Share on Pinterest"
-                                        className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center transition-colors hover:bg-red-700"
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={faPinterestP}
-                                            className="w-4 h-4"
-                                        />
-                                    </a>
-                                    {/* LinkedIn - Blue-700 */}
-                                    <a
-                                        href="#"
-                                        aria-label="Share on LinkedIn"
-                                        className="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center transition-colors hover:bg-blue-800"
-                                    >
-                                        <FontAwesomeIcon
-                                            icon={faLinkedinIn}
-                                            className="w-4 h-4"
-                                        />
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
+                    </p>
+                  </div>
+                  <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+                  {/* Format Selector */}
+                  <div className="mb-8">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      FORMAT:{" "}
+                      <span className="font-bold">
+                        {selectedFormat.toUpperCase()}
+                      </span>
+                    </label>
+                    <div className="flex space-x-3">
+                      {Object.keys(formatPrices || {}).map((format) => (
+                        <button
+                          key={format}
+                          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+                            format === selectedFormat
+                              ? "bg-gray-900 text-white"
+                              : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
+                          }`}
+                          onClick={() => handleFormatClick(format)}
+                        >
+                          {format}
+                        </button>
+                      ))}
                     </div>
-                    {/* --- TABS SECTION (UNCHANGED) --- */}
-                    <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-25">
-                        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
-                        <div className="">
-                            <nav className="-mb-px justify-center flex space-x-8">
-                                {[
-                                    "Description",
-                                    "Additional Information",
-                                    "Reviews",
-                                ].map((tab) => (
-                                    <a
-                                        key={tab}
-                                        href="#"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            setActiveTab(tab);
-                                            // Hide form/success message when switching tabs
-                                            setIsReviewFormVisible(false);
-                                            setReviewSubmitted(false);
-                                            setSidebarContent(null); // 🚀 Hide sidebar on tab switch
-                                            // 🚀 Reset reviews to initial limit on tab switch
-                                            setReviewsToShow(
-                                                INITIAL_REVIEW_LIMIT
-                                            );
-                                        }}
-                                        // Use dark green background for the active tab to match the image style
-                                        className={`
+                  </div>
+                  <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+
+                  {/* ⭐️ MODIFIED: Quantity and Action Buttons - Centered */}
+                  {/* 🚀 --- NEW: Attached ref to this div --- */}
+                  <div
+                    className="flex flex-row gap-5 justify-center items-center space-y-4 mb-6"
+                    ref={addToCartRef}
+                  >
+                    {/* Quantity Selector - Centered */}
+                    <div className="flex mt-5 items-center border border-gray-300 rounded-lg">
+                      <button
+                        onClick={minusminus}
+                        className="px-3 py-2.5 text-black hover:bg-gray-50 rounded-l-lg"
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        defaultValue="1"
+                        value={qtyValue}
+                        min="1"
+                        className="w-12 text-center border-gray-300 text-black"
+                      />
+                      <button
+                        onClick={plusplus}
+                        className="px-3 py-2.5 text-gray-500 hover:bg-gray-50 rounded-r-lg"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    {/* Action Buttons - Centered as a Group, Spanning a max width */}
+                    <div className="flex w-full max-w-lg space-x-4">
+                      <button
+                        // ⭐️ HOVER CHANGE: from hover:bg-green-800 to hover:bg-green-600
+                        className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
+                        onClick={() => console.log("Added set to cart")}
+                      >
+                        Add to Cart
+                      </button>
+
+                      <button
+                        // ⭐️ HOVER CHANGE: from hover:bg-green-800 to hover:bg-green-600
+                        className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
+                        onClick={() => console.log("Buy It Now")}
+                      >
+                        Buy It Now
+                      </button>
+                    </div>
+                  </div>
+                  {/* <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" /> */}
+
+                  {/* Wishlist & Compare Links */}
+                  <div className="flex items-center justify-center space-x-6 text-sm mb-6 w-full">
+                    <button className="flex  items-center text-gray-600 hover:text-gray-900">
+                      <img
+                        src="/src/assets/heart.svg"
+                        className="w-4 h-4 opacity-100 mr-1"
+                        alt=""
+                      />
+                      Add To Wishlist
+                    </button>
+                    <button className="flex items-center text-gray-600 hover:text-gray-900">
+                      <img
+                        src="/src/assets/compare.svg"
+                        className="w-4 h-4 opacity-70 mr-1"
+                        alt=""
+                      />
+                      Add To Compare
+                    </button>
+                  </div>
+                  <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+                  {/* Delivery Info */}
+                  <DeliveryInfo />
+                  {/* Payment Options */}
+                  <PaymentOptions />
+                  {/* Categories & Tags */}
+                  <div className="mt-6 text-s text-gray-500">
+                    <p>
+                      <strong>Categories:</strong> Books, Books New, Fantasy,
+                      Fiction, Kids Books, Non Fiction
+                    </p>
+                    <p className="mt-2">
+                      <strong>Tags:</strong> Ebook
+                    </p>
+                  </div>
+                  {/* Social Icons */}
+                  <div className="flex items-center space-x-3 mt-6">
+                    {/* Facebook - Blue-600 */}
+                    <a
+                      href="#"
+                      aria-label="Share on Facebook"
+                      className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center transition-colors hover:bg-blue-700"
+                    >
+                      <FontAwesomeIcon icon={faFacebookF} className="w-4 h-4" />
+                    </a>
+                    {/* Twitter (X) - Sky-500 (Using old blue color as per your original request, but updated Font Awesome icon for X) */}
+                    <a
+                      href="#"
+                      aria-label="Share on X (Twitter)"
+                      className="w-8 h-8 rounded-full bg-sky-500 text-white flex items-center justify-center transition-colors hover:bg-sky-600"
+                    >
+                      <FontAwesomeIcon icon={faTwitter} className="w-4 h-4" />
+                    </a>
+                    {/* Pinterest - Red-600 */}
+                    <a
+                      href="#"
+                      aria-label="Share on Pinterest"
+                      className="w-8 h-8 rounded-full bg-red-600 text-white flex items-center justify-center transition-colors hover:bg-red-700"
+                    >
+                      <FontAwesomeIcon
+                        icon={faPinterestP}
+                        className="w-4 h-4"
+                      />
+                    </a>
+                    {/* LinkedIn - Blue-700 */}
+                    <a
+                      href="#"
+                      aria-label="Share on LinkedIn"
+                      className="w-8 h-8 rounded-full bg-blue-700 text-white flex items-center justify-center transition-colors hover:bg-blue-800"
+                    >
+                      <FontAwesomeIcon
+                        icon={faLinkedinIn}
+                        className="w-4 h-4"
+                      />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* --- TABS SECTION (UNCHANGED) --- */}
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-25">
+              <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+              <div className="">
+                <nav className="-mb-px justify-center flex space-x-8">
+                  {["Description", "Additional Information", "Reviews"].map(
+                    (tab) => (
+                      <a
+                        key={tab}
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setActiveTab(tab);
+                          // Hide form/success message when switching tabs
+                          setIsReviewFormVisible(false);
+                          setReviewSubmitted(false);
+                          setSidebarContent(null); // 🚀 Hide sidebar on tab switch
+                          // 🚀 Reset reviews to initial limit on tab switch
+                          setReviewsToShow(INITIAL_REVIEW_LIMIT);
+                        }}
+                        // Use dark green background for the active tab to match the image style
+                        className={`
                                     ${
-                                        tab === activeTab
-                                            ? "bg-green-900 text-white font-semibold  shadow-md"
-                                            : "bg-white text-gray-900 font-medium"
+                                      tab === activeTab
+                                        ? "bg-green-900 text-white font-semibold  shadow-md"
+                                        : "bg-white text-gray-900 font-medium"
                                     }
                                     whitespace-nowrap py-4 px-8 text-sm transition-colors rounded-md border border-transparent 
                                      ${
-                                         tab !== activeTab
-                                             ? "hover:bg-gray-100"
-                                             : ""
+                                       tab !== activeTab
+                                         ? "hover:bg-gray-100"
+                                         : ""
                                      }
                                 `}
-                                    >
-                                        {tab}
-                                    </a>
-                                ))}
-                            </nav>
-                        </div>
-                        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
+                      >
+                        {tab}
+                      </a>
+                    )
+                  )}
+                </nav>
+              </div>
+              <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-300" />
 
-                        <div className="py-8 text-gray-700">
-                            {/* Description Content (MODIFIED: Links open sidebar) */}
-                            {activeTab === "Description" && (
-                                // ... (Description Content)
-                                <div>
-                                    <p className="mb-4">
-                                        {mainProduct.description ||
-                                            `From the author of The Longest Ride and
+              <div className="py-8 text-gray-700">
+                {/* Description Content (MODIFIED: Links open sidebar) */}
+                {activeTab === "Description" && (
+                  // ... (Description Content)
+                  <div>
+                    <p className="mb-4">
+                      {mainProduct.description ||
+                        `From the author of The Longest Ride and
                                         The Return comes a novel about the
                                         enduring legacy of first love, and the
                                         decisions that haunt us forever. 1996
@@ -1602,264 +1576,234 @@ export const ProductLayoutScrollFixed = () => {
                                         behind . . . until she met Bryce
                                         Trickett, one of the few teenagers on
                                         the island.`}
-                                    </p>
-                                    <p>
-                                        Handsome, genuine, and newly admitted to
-                                        West Point, Bryce showed her how much
-                                        there was to love about the wind-swept
-                                        beach town--and introduced her to
-                                        photography, a passion that would define
-                                        the rest of her life. A collection of 10
-                                        well-researched board books to introduce
-                                        a wide range of learning topics and
-                                        everyday objects to the little scholars.
-                                        The topics included in the set are -
-                                        ABC, Numbers, Shapes, Colours, Wild
-                                        Animals, Farm Animals and Pets, Birds,
-                                        Fruits, Vegetables and Transport.
-                                    </p>
-                                    {/* Added text and links based on image_bf8379.png - MODIFIED to open sidebar */}
-                                    <div className="flex space-x-6 mt-6 text-sm text-gray-500">
-                                        {/* Shipping & Returns (Text links) */}
+                    </p>
+                    <p>
+                      Handsome, genuine, and newly admitted to West Point, Bryce
+                      showed her how much there was to love about the wind-swept
+                      beach town--and introduced her to photography, a passion
+                      that would define the rest of her life. A collection of 10
+                      well-researched board books to introduce a wide range of
+                      learning topics and everyday objects to the little
+                      scholars. The topics included in the set are - ABC,
+                      Numbers, Shapes, Colours, Wild Animals, Farm Animals and
+                      Pets, Birds, Fruits, Vegetables and Transport.
+                    </p>
+                    {/* Added text and links based on image_bf8379.png - MODIFIED to open sidebar */}
+                    <div className="flex space-x-6 mt-6 text-sm text-gray-500">
+                      {/* Shipping & Returns (Text links) */}
 
-                                        <span
-                                            className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setSidebarContent(
-                                                    "ShippingReturns"
-                                                ); // 🚀 ADDED HANDLER
-                                            }}
-                                        >
-                                            <img
-                                                src="/src/assets/tempo.svg"
-                                                className="h-5 w-5"
-                                                alt=""
-                                            />
-                                            Shipping & Returns
-                                        </span>
-                                        {/* Warranty (Text links) */}
-                                        <span
-                                            className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setSidebarContent("Warranty"); // 🚀 ADDED HANDLER
-                                            }}
-                                        >
-                                            <img
-                                                src="/src/assets/medal.svg"
-                                                className="h-5 w-5 opacity-50"
-                                                alt=""
-                                            />
-                                            Warranty
-                                        </span>
-                                        {/* Secure Payment (Text links) */}
-                                        <span
-                                            className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setSidebarContent(
-                                                    "SecurePayment"
-                                                ); // 🚀 ADDED HANDLER
-                                            }}
-                                        >
-                                            <img
-                                                src="/src/assets/license.svg"
-                                                className="h-5 w-5 opacity-50"
-                                                alt=""
-                                            />
-                                            Secure Payment
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Additional Information Content (MODIFIED: Link opens sidebar) */}
-                            {activeTab === "Additional Information" && (
-                                <div>
-                                    <p className="mb-4 opacity-80">
-                                        <p>
-                                            By changing our most important
-                                            processes and
-                                        </p>{" "}
-                                        <p>
-                                            products, we have already made a big
-                                            leap forward. This ranges from the
-                                        </p>{" "}
-                                        <p>
-                                            increased use of more sustainable
-                                            fibers to the use of more{"    "}
-                                        </p>{" "}
-                                        <p>
-                                            environmentally friendly printing
-                                            processes to the development of{" "}
-                                        </p>{" "}
-                                        <p>
-                                            efficient waste management in our
-                                            value chain.
-                                        </p>{" "}
-                                    </p>
-                                    <a
-                                        href="#"
-                                        className="opacity-80 underline hover:text-gray-900"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            setSidebarContent("Sustainability"); // 🚀 ADDED HANDLER
-                                        }}
-                                    >
-                                        Learn more about sustainability
-                                    </a>
-                                </div>
-                            )}
-
-                            {/* 🚀 MODIFIED: Reviews Content (Full Logic) */}
-                            {activeTab === "Reviews" && (
-                                <div className="flex flex-col items-center justify-center text-center w-full">
-                                    {/* 🚀 2. Review Submitted Success Message */}
-                                    {reviewSubmitted && (
-                                        <div className="w-full max-w-4xl mx-auto p-4 mb-8 bg-green-50 border-2 border-green-200 rounded-lg">
-                                            <h3 className="text-xl font-semibold mb-2 text-green-700">
-                                                Review Submitted!
-                                            </h3>
-                                            <p className="text-sm text-green-700 mb-4">
-                                                Thank you! Please refresh the
-                                                page in a few moments to see
-                                                your review. You can remove or
-                                                edit your review by logging into{" "}
-                                                <a
-                                                    href="#"
-                                                    className="underline font-medium hover:text-green-900"
-                                                >
-                                                    judgeme.me
-                                                </a>
-                                                .
-                                            </p>
-                                            <button
-                                                onClick={handleRefreshPage}
-                                                className="py-2 px-4 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md"
-                                            >
-                                                Refresh page
-                                            </button>
-                                        </div>
-                                    )}
-
-                                    {/* 🚀 1. If Form is Visible, show form */}
-                                    {isReviewFormVisible ? (
-                                        <ReviewForm
-                                            onCancel={() =>
-                                                setIsReviewFormVisible(false)
-                                            }
-                                            onSubmit={handleReviewSubmit}
-                                        />
-                                    ) : (
-                                        <>
-                                            {/* If No Reviews, show "Be the first" */}
-                                            {reviews.length === 0 ? (
-                                                <>
-                                                    <h3 className="text-xl font-semibold mb-4 text-gray-900">
-                                                        Customer Reviews
-                                                    </h3>
-                                                    <StarRating
-                                                        rating={0}
-                                                        reviewCount={0}
-                                                    />
-                                                    <span className="text-sm text-gray-500 mb-4">
-                                                        Be the first to write a
-                                                        review
-                                                    </span>
-                                                    <button
-                                                        className="bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
-                                                        onClick={() =>
-                                                            setIsReviewFormVisible(
-                                                                true
-                                                            )
-                                                        }
-                                                    >
-                                                        Write a review
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                /* 🚀 If Reviews Exist, show the new layout (image_30be69.png) */
-                                                <div className="w-full max-w-4xl mx-auto text-left">
-                                                    <h3 className="text-xl font-semibold mb-6 text-gray-900 text-center">
-                                                        Customer Reviews
-                                                    </h3>
-                                                    <div className="flex flex-col lg:flex-row justify-between gap-8 items-center mb-6">
-                                                        {/* Left Side: Summary & Bars */}
-                                                        <div className="lg:w-2/3 w-full">
-                                                            <ReviewSummary
-                                                                reviews={
-                                                                    reviews
-                                                                }
-                                                            />
-                                                        </div>
-                                                        {/* Right Side: Write a Review Button */}
-                                                        <div className="lg:w-1/3 w-full flex lg:justify-end justify-center items-start">
-                                                            <button
-                                                                className="py-3 px-6 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md"
-                                                                onClick={() => {
-                                                                    setIsReviewFormVisible(
-                                                                        true
-                                                                    );
-                                                                    setReviewSubmitted(
-                                                                        false
-                                                                    ); // Hide success message
-                                                                }}
-                                                            >
-                                                                Write a review
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                    <hr className="my-6 border-gray-200" />
-                                                    {/* Bottom: Review List with Dropdown */}
-                                                    <ReviewList
-                                                        reviews={reviews}
-                                                        onImageClick={
-                                                            handleReviewImageClick // 🚀 UPDATED
-                                                        }
-                                                        // 🚀 NEW PAGINATION PROPS
-                                                        reviewsToShow={
-                                                            reviewsToShow
-                                                        }
-                                                        setReviewsToShow={
-                                                            setReviewsToShow
-                                                        }
-                                                    />
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    {/* --- CAROUSELS SECTION (UNCHANGED) --- */}
-                    <hr className="my-3 max-w-8xl mx-auto border-gray-200" />
-                    <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <ProductCarousel
-                            title="Related Products"
-                            productIds={relatedProductIds}
-                            onViewProduct={handleViewProduct}
-                            showBrowseButton={false}
-                            titleCenter={true}
-                            slidesToShowCount={4}
+                      <span
+                        className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSidebarContent("ShippingReturns"); // 🚀 ADDED HANDLER
+                        }}
+                      >
+                        <img
+                          src="/src/assets/tempo.svg"
+                          className="h-5 w-5"
+                          alt=""
                         />
-                    </div>
-                    <hr className="my-3 max-w-8xl mx-auto border-gray-200" />
-                    <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <ProductCarousel
-                            title="You may also like"
-                            productIds={youMayAlsoLikeIds}
-                            onViewProduct={handleViewProduct}
-                            showBrowseButton={false}
-                            titleCenter={true}
-                            slidesToShowCount={4}
+                        Shipping & Returns
+                      </span>
+                      {/* Warranty (Text links) */}
+                      <span
+                        className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSidebarContent("Warranty"); // 🚀 ADDED HANDLER
+                        }}
+                      >
+                        <img
+                          src="/src/assets/medal.svg"
+                          className="h-5 w-5 opacity-50"
+                          alt=""
                         />
+                        Warranty
+                      </span>
+                      {/* Secure Payment (Text links) */}
+                      <span
+                        className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setSidebarContent("SecurePayment"); // 🚀 ADDED HANDLER
+                        }}
+                      >
+                        <img
+                          src="/src/assets/license.svg"
+                          className="h-5 w-5 opacity-50"
+                          alt=""
+                        />
+                        Secure Payment
+                      </span>
                     </div>
-                    <div className="h-16"></div> {/* Added bottom spacing */}
-                </>
-            )}
-        </div>
+                  </div>
+                )}
+
+                {/* Additional Information Content (MODIFIED: Link opens sidebar) */}
+                {activeTab === "Additional Information" && (
+                  <div>
+                    <p className="mb-4 opacity-80">
+                      <p>By changing our most important processes and</p>{" "}
+                      <p>
+                        products, we have already made a big leap forward. This
+                        ranges from the
+                      </p>{" "}
+                      <p>
+                        increased use of more sustainable fibers to the use of
+                        more{"    "}
+                      </p>{" "}
+                      <p>
+                        environmentally friendly printing processes to the
+                        development of{" "}
+                      </p>{" "}
+                      <p>efficient waste management in our value chain.</p>{" "}
+                    </p>
+                    <a
+                      href="#"
+                      className="opacity-80 underline hover:text-gray-900"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSidebarContent("Sustainability"); // 🚀 ADDED HANDLER
+                      }}
+                    >
+                      Learn more about sustainability
+                    </a>
+                  </div>
+                )}
+
+                {/* 🚀 MODIFIED: Reviews Content (Full Logic) */}
+                {activeTab === "Reviews" && (
+                  <div className="flex flex-col items-center justify-center text-center w-full">
+                    {/* 🚀 2. Review Submitted Success Message */}
+                    {reviewSubmitted && (
+                      <div className="w-full max-w-4xl mx-auto p-4 mb-8 bg-green-50 border-2 border-green-200 rounded-lg">
+                        <h3 className="text-xl font-semibold mb-2 text-green-700">
+                          Review Submitted!
+                        </h3>
+                        <p className="text-sm text-green-700 mb-4">
+                          Thank you! Please refresh the page in a few moments to
+                          see your review. You can remove or edit your review by
+                          logging into{" "}
+                          <a
+                            href="#"
+                            className="underline font-medium hover:text-green-900"
+                          >
+                            judgeme.me
+                          </a>
+                          .
+                        </p>
+                        <button
+                          onClick={handleRefreshPage}
+                          className="py-2 px-4 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md"
+                        >
+                          Refresh page
+                        </button>
+                      </div>
+                    )}
+
+                    {/* 🚀 1. If Form is Visible, show form */}
+                    {isReviewFormVisible ? (
+                      <ReviewForm
+                        onCancel={() => setIsReviewFormVisible(false)}
+                        onSubmit={handleReviewSubmit}
+                      />
+                    ) : (
+                      <>
+                        {/* If No Reviews, show "Be the first" */}
+                        {reviews.length === 0 ? (
+                          <>
+                            <h3 className="text-xl font-semibold mb-4 text-gray-900">
+                              Customer Reviews
+                            </h3>
+                            <StarRating rating={0} reviewCount={0} />
+                            <span className="text-sm text-gray-500 mb-4">
+                              Be the first to write a review
+                            </span>
+                            <button
+                              className="bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
+                              onClick={() => setIsReviewFormVisible(true)}
+                            >
+                              Write a review
+                            </button>
+                          </>
+                        ) : (
+                          /* 🚀 If Reviews Exist, show the new layout (image_30be69.png) */
+                          <div className="w-full max-w-4xl mx-auto text-left">
+                            <h3 className="text-xl font-semibold mb-6 text-gray-900 text-center">
+                              Customer Reviews
+                            </h3>
+                            <div className="flex flex-col lg:flex-row justify-between gap-8 items-center mb-6">
+                              {/* Left Side: Summary & Bars */}
+                              <div className="lg:w-2/3 w-full">
+                                <ReviewSummary reviews={reviews} />
+                              </div>
+                              {/* Right Side: Write a Review Button */}
+                              <div className="lg:w-1/3 w-full flex lg:justify-end justify-center items-start">
+                                <button
+                                  className="py-3 px-6 bg-green-700 text-white font-bold rounded-lg hover:bg-green-600 transition-colors shadow-md"
+                                  onClick={() => {
+                                    setIsReviewFormVisible(true);
+                                    setReviewSubmitted(false); // Hide success message
+                                  }}
+                                >
+                                  Write a review
+                                </button>
+                              </div>
+                            </div>
+                            <hr className="my-6 border-gray-200" />
+                            {/* Bottom: Review List with Dropdown */}
+                            <ReviewList
+                              reviews={reviews}
+                              onImageClick={
+                                handleReviewImageClick // 🚀 UPDATED
+                              }
+                              // 🚀 NEW PAGINATION PROPS
+                              reviewsToShow={reviewsToShow}
+                              setReviewsToShow={setReviewsToShow}
+                            />
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+            {/* --- CAROUSELS SECTION (UNCHANGED) --- */}
+            <hr className="my-3 max-w-8xl mx-auto border-gray-200" />
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+              <ProductCarousel
+                title="Related Products"
+                onQuickView={(product) => setQuickViewProduct(product)} // <--- ADD THIS LINE
+                productIds={relatedProductIds}
+                onViewProduct={handleViewProduct}
+                showBrowseButton={false}
+                titleCenter={true}
+                slidesToShowCount={4}
+                />
+            </div>
+            <hr className="my-3 max-w-8xl mx-auto border-gray-200" />
+            <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+              <ProductCarousel
+                title="You may also like"
+                onQuickView={(product) => setQuickViewProduct(product)} // <--- ADD THIS LINE
+                productIds={youMayAlsoLikeIds}
+                onViewProduct={handleViewProduct}
+                showBrowseButton={false}
+                titleCenter={true}
+                slidesToShowCount={4}
+              />
+            </div>
+            <div className="h-16"></div> {/* Added bottom spacing */}
+          </>
+        )}
+        <QuickViewDrawer
+          isOpen={!!quickViewProduct}
+          onClose={() => setQuickViewProduct(null)}
+          product={quickViewProduct}
+        />
+      </div>
     );
 };
 

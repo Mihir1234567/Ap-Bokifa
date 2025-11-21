@@ -753,7 +753,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
         { title: "About Us", path: "/about" },
         { title: "Contact", path: "/contact" },
         { title: "Our Team", path: "/our-team" },
-        { title: "FAQs", path: "/faqs" },
+        { title: "FAQs", path: "/FAQ" },
         { title: "LookBook", path: "/lookbook" },
         { title: "404", path: "/PageNotFound" },
     ];

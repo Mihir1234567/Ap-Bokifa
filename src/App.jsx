@@ -35,6 +35,7 @@ import ContactPage from "./pages/ContactPage";
 import MeetOurTeam from "./pages/OurTeam";
 import NotFoundPage from "./pages/PageNotFound";
 import LookBook from "./pages/LookBook";
+import FAQPage from "./pages/FAQPage";
 
 const App = () => {
   // 1. State to control the visibility of the coupon
@@ -164,6 +165,7 @@ const App = () => {
           <Route path="/our-team" element={<MeetOurTeam />} />
           <Route path="/PageNotFound" element={<NotFoundPage />} />
           <Route path="/LookBook" element={<LookBook />} />
+          <Route path="/FAQ" element={<FAQPage />} />
           <Route path="/*" element={<NotFoundPage />} />
         </Routes>
 

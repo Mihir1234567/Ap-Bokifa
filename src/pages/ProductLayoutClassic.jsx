@@ -932,10 +932,6 @@ export const ProductLayoutClassic = () => {
   // 🚀 --- NEW: Local Storage Key for Reviews ---
   const LOCAL_STORAGE_KEY = `productReviews_${mainProductId}`;
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
   // State to manage the selected image index and selected format

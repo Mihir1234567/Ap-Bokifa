@@ -56,12 +56,14 @@ const Home = ({ showCoupon }) => {
         productIds={isHighlightIds}
         onViewProduct={addRecentlyViewed}
         slidesToShowCount={6}
+      onQuickView={(product) => setActiveProduct(product)}
       />
       <Categories></Categories>
       <ProductCarousel
         title="Current Bestsellers"
         productIds={BestSellingIds}
         onViewProduct={addRecentlyViewed}
+        onQuickView={(product) => setActiveProduct(product)}
         slidesToShowCount={6}
       />
       <ThrillerBanner />
@@ -69,6 +71,7 @@ const Home = ({ showCoupon }) => {
         title="Current Bestsellers"
         productIds={HalfPriced}
         onViewProduct={addRecentlyViewed}
+        onQuickView={(product) => setActiveProduct(product)}
         slidesToShowCount={6}
       />
       <BannerGrid />
@@ -77,8 +80,10 @@ const Home = ({ showCoupon }) => {
         smallBook={smallBooks}
         onViewProduct={addRecentlyViewed} // Also ensure this component accepts and passes it down
         onQuickView={(product) => setActiveProduct(product)}
-      />
+        />
       <QuickViewDrawer
+        onQuickView={(product) => setActiveProduct(product)}
+        onViewProduct={addRecentlyViewed} // Also ensure this component accepts and passes it down
         isOpen={!!activeProduct}
         onClose={() => setActiveProduct(null)}
         product={activeProduct}

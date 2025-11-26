@@ -16,7 +16,7 @@ const AccordionItem = ({ question, answer, isFirst, index }) => {
           // if the user scrolls quickly or on initial load
           setTimeout(() => {
             setIsVisible(true);
-          }, (index % 5) * 100); // Modulo 5 ensures delay doesn't get too long for items far down
+          }, (index % 2) * 100); // Modulo 5 ensures delay doesn't get too long for items far down
           observer.disconnect(); // Only animate once
         }
       },

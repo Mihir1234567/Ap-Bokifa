@@ -6,6 +6,7 @@ import { Routes, Route, useLocation, Link } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
+import ScrollToTop from "./pages/ScrollToTop";
 import RecentlyViewedSidebar from "./components/RecentlyViewedSidebar";
 import Footer from "./components/Footer";
 import NewsletterSocials from "./components/product/NewsletterSocials";
@@ -49,21 +50,6 @@ const App = () => {
 
   // Get current location to detect route changes
   const location = useLocation();
-
-  // 🚀 Effect to refresh page when route changes
-  useEffect(() => {
-    // Store the previous location to avoid refresh on initial mount
-    const previousLocation = sessionStorage.getItem("previousLocation");
-    const currentLocation = location.pathname + location.search;
-
-    if (previousLocation && previousLocation !== currentLocation) {
-      // Route has changed, refresh the page
-      window.location.reload();
-    }
-
-    // Update the stored location
-    sessionStorage.setItem("previousLocation", currentLocation);
-  }, [location.pathname, location.search]);
 
   // 💡 --- EFFECT TO BLOCK SCROLL --- 💡
   useEffect(() => {
@@ -116,6 +102,7 @@ const App = () => {
   return (
     <>
       <div className="flex flex-col min-h-screen">
+        <ScrollToTop />
         {/* 4. Pass the open function to your Navbar */}
         <Navbar
           onUpsellClick={openUpsellModal}

@@ -37,6 +37,7 @@ export default function NewsAndEvents() {
             author: "HA EI",
             title: "5 Attractive Bookstore WordPress Themes",
             imageUrl: "/src/assets/News1.jpg",
+            link: "/blog/post/1",
         },
         {
             id: 2,
@@ -45,6 +46,7 @@ export default function NewsAndEvents() {
             author: "HA EI",
             title: "Top 10 Books to Make It a Great Yeargh",
             imageUrl: "/src/assets/News2.jpg",
+            link: "/blog/post/2",
         },
         {
             id: 3,
@@ -53,6 +55,7 @@ export default function NewsAndEvents() {
             author: "HA EI",
             title: "Author Special: A Q&A with Brené Brown",
             imageUrl: "/src/assets/News3.jpg",
+            link: "/blog/post/3",
         },
         {
             id: 4,
@@ -61,6 +64,7 @@ export default function NewsAndEvents() {
             author: "HA EI",
             title: "Top 5 Tarot Decks for the Tarot World Summit",
             imageUrl: "/src/assets/News4.jpg",
+            link: "/blog/post/4",
         },
     ];
 

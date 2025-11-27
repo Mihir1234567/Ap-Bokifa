@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom"; // 1. Import useNavigate
-import { Heart, Star, ShoppingCart, Eye } from "lucide-react";
+import { Heart, Star, ShoppingCart, Eye, Repeat } from "lucide-react";
 import ALL_PRODUCTS from "../productsData";
 import { useCurrency } from "../../context/CurrencyContext";
+import { useWishlist } from "../../context/WishlistContext";
+import { useCompare } from "../../context/CompareContext";
 
 // --- Currency Conversion Utility ---
 const CONVERSION_RATES = {
@@ -102,6 +104,8 @@ export const PicksForYouSection = ({
   onQuickView, // Make sure Parent passes this prop!
 }) => {
   const { currency } = useCurrency();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { toggleCompare, isInCompare } = useCompare();
   const navigate = useNavigate(); // Hook for navigation
 
   const featuredBook = ALL_PRODUCTS.find((book) =>
@@ -109,7 +113,8 @@ export const PicksForYouSection = ({
   );
   const smallBooks = ALL_PRODUCTS.filter((book) => smallBook.includes(book.id));
 
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const isWishlisted = featuredBook ? isInWishlist(featuredBook.id) : false;
+  const isCompared = featuredBook ? isInCompare(featuredBook.id) : false;
 
   if (!featuredBook || smallBooks.length === 0) {
     return (
@@ -176,7 +181,7 @@ export const PicksForYouSection = ({
                 className="bg-white/80 rounded-full p-2 hover:bg-white transition-colors shadow-md"
                 onClick={(e) => {
                   e.stopPropagation(); // Stop navigation
-                  setIsWishlisted(!isWishlisted);
+                  toggleWishlist(featuredBook);
                 }}
               >
                 <Heart
@@ -206,17 +211,21 @@ export const PicksForYouSection = ({
 
                 <div className="relative flex items-center group/icon">
                   <button
-                    className="bg-white/80 rounded-full p-2 text-green-600 hover:bg-white transition-colors shadow-md"
-                    onClick={(e) => e.stopPropagation()}
+                    className="bg-white/80 rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleCompare(featuredBook);
+                    }}
                   >
-                    <img
-                      src="/src/assets/compare.svg"
-                      alt="compare"
-                      className="w-5 h-5"
+                    <Repeat
+                      className={`${
+                        isCompared ? "text-red-500" : "text-gray-900"
+                      }`}
+                      size={20}
                     />
                   </button>
                   <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
-                    Compare
+                    {isCompared ? "Remove compare" : "Compare"}
                   </span>
                 </div>
               </div>

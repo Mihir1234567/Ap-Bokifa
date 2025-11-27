@@ -17,17 +17,16 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import CollectionsBooks from "./pages/CollectionsBooks";
 import CategoryLanding from "./pages/CategoryLanding";
-import { Coupon } from "./components/Coupon"; // Keep this import
+import { Coupon } from "./components/Coupon";
 import { ProductLayoutClassic } from "./pages/ProductLayoutClassic";
 import { ProductLayoutScrollFixed } from "./pages/ProductLayoutScrollFixed";
 import { ProductLayoutLeftThumbs } from "./pages/ProductLayoutLeftThumbs";
 import { ProductLayoutRightThumbs } from "./pages/ProductLayoutRightThumbs";
 import { ProductLayoutWithoutThumbs } from "./pages/ProductLayoutWithoutThumbs";
 import { TypeWithVideo } from "./pages/TypeWithVideo";
-import ProductDetailPage from "./pages/ProductDetailPage"; // New import for product detail page
+import ProductDetailPage from "./pages/ProductDetailPage";
 
-// --- NEW IMPORTS ---
-import UpsellModal from "./components/UpsellModal"; // 1. Import the new modal
+import UpsellModal from "./components/UpsellModal";
 import CrossSell from "./components/CrossSell";
 import BlogPage from "./pages/BlogPage_Grid";
 import BlogPageList from "./pages/BlogPage_Standard";
@@ -38,12 +37,18 @@ import MeetOurTeam from "./pages/OurTeam";
 import NotFoundPage from "./pages/PageNotFound";
 import LookBook from "./pages/LookBook";
 import FAQPage from "./pages/FAQPage";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import CartPage from "./pages/CartPage";
+import Wishlist from "./pages/Wishlist";
+import Compare from "./pages/Compare";
+import { WishlistProvider } from "./context/WishlistContext";
+import { CompareProvider } from "./context/CompareContext";
 
 const App = () => {
   // 1. State to control the visibility of the coupon
   const [isCouponVisible, setIsCouponVisible] = useState(false);
 
-  // --- NEW STATE ---
   // 2. Add new state for the upsell modal
   const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
   const [isCrossSellOpen, setIsCrossSellOpen] = useState(false);
@@ -51,29 +56,27 @@ const App = () => {
   // Get current location to detect route changes
   const location = useLocation();
 
-  // 💡 --- EFFECT TO BLOCK SCROLL --- 💡
-  useEffect(() => {
-    // This function blocks/unblocks body scrolling
-    const body = document.body;
-    // Check for both modals
-    if (isUpsellModalOpen || isCrossSellOpen || isCouponVisible) {
-      body.style.overflow = "hidden"; // Disable scroll
-    } else {
-      body.style.overflow = "auto"; // Enable scroll
-    }
+  // 💡 LIST OF ROUTES WHERE NAV, FOOTER, & SIDEBARS SHOULD BE HIDDEN
+  const hideLayoutRoutes = ["/signup", "/login"];
+  const shouldShowLayout = !hideLayoutRoutes.includes(location.pathname);
 
-    // Cleanup function to re-enable scroll when component unmounts
+  // 💡 EFFECT TO BLOCK SCROLL
+  useEffect(() => {
+    const body = document.body;
+    if (isUpsellModalOpen || isCrossSellOpen || isCouponVisible) {
+      body.style.overflow = "hidden";
+    } else {
+      body.style.overflow = "auto";
+    }
     return () => {
       body.style.overflow = "auto";
     };
-  }, [isUpsellModalOpen, isCrossSellOpen, isCouponVisible]); // 💡 Runs when *either* modal's state changes
+  }, [isUpsellModalOpen, isCrossSellOpen, isCouponVisible]);
 
-  // 2. Function to close the coupon modal (used by the 'X' button)
   const closeCoupon = () => {
     setIsCouponVisible(false);
   };
 
-  // 4. Function for manual trigger (you can call this from any component)
   const showCouponManually = (e) => {
     if (e) e.preventDefault();
     setIsCouponVisible(true);
@@ -82,17 +85,15 @@ const App = () => {
     setIsCrossSellOpen(true);
   };
 
-  // --- NEW FUNCTIONS ---
-  // 3. Add open/close functions for the upsell modal
   const openUpsellModal = (e) => {
-    if (e) e.preventDefault(); // Prevent link navigation
+    if (e) e.preventDefault();
     setIsUpsellModalOpen(true);
   };
   const closeUpsellModal = () => {
     setIsUpsellModalOpen(false);
   };
   const openCrossSellModal = (e) => {
-    if (e) e.preventDefault(); // Prevent link navigation
+    if (e) e.preventDefault();
     setIsCrossSellOpen(true);
   };
   const closeCrossSellModal = () => {
@@ -101,75 +102,93 @@ const App = () => {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen">
-        <ScrollToTop />
-        {/* 4. Pass the open function to your Navbar */}
-        <Navbar
-          onUpsellClick={openUpsellModal}
-          onCrossSellClick={openCrossSellModal}
-          onCouponClick={showCouponManually}
-        />
+      <WishlistProvider>
+        <CompareProvider>
+          <div className="flex flex-col min-h-screen">
+            <ScrollToTop />
 
-        <Routes>
-          {/* Your existing routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/leftSidebar" element={<BookstorePage />} />
-          <Route path="/collections/categories" element={<CategoryLanding />} />
-          <Route path="/collections/books" element={<CollectionsBooks />} />
-
-          <Route
-            path="/productPageClassic"
-            element={<ProductLayoutClassic />}
-          />
-          <Route
-            path="/productPageScrollFixed"
-            element={<ProductLayoutScrollFixed />}
-          />
-          <Route
-            path="/productPageLeftThumbs"
-            element={<ProductLayoutLeftThumbs />}
-          />
-          <Route
-            path="/productPageRightThumbs"
-            element={<ProductLayoutRightThumbs />}
-          />
-          <Route
-            path="/productPageWithoutThumbs"
-            element={<ProductLayoutWithoutThumbs />}
-          />
-          <Route path="/typeWithVideo" element={<TypeWithVideo />} />
-          <Route path="/product/:productId" element={<ProductDetailPage />} />
-          <Route path="/blog/grid" element={<BlogPage />} />
-          <Route path="/blog/standard" element={<BlogPageList />} />
-          <Route
-            path="/blog/post/:postId"
-            element={
-              <BlogPostDetailWithSidebar
-                onSearchClick={() => console.log("Search clicked")}
+            {/* 4. Only show Navbar if we are NOT on a hidden route */}
+            {shouldShowLayout && (
+              <Navbar
+                onUpsellClick={openUpsellModal}
+                onCrossSellClick={openCrossSellModal}
+                onCouponClick={showCouponManually}
               />
-            }
-          />
-          <Route path="/about" element={<AboutSection />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/our-team" element={<MeetOurTeam />} />
-          <Route path="/PageNotFound" element={<NotFoundPage />} />
-          <Route path="/LookBook" element={<LookBook />} />
-          <Route path="/FAQ" element={<FAQPage />} />
-          <Route path="/*" element={<NotFoundPage />} />
-        </Routes>
+            )}
 
-        <RecentlyViewedSidebar />
-        <NewsletterSocials />
-        <Footer />
-      </div>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/leftSidebar" element={<BookstorePage />} />
+              <Route
+                path="/collections/categories"
+                element={<CategoryLanding />}
+              />
+              <Route path="/collections/books" element={<CollectionsBooks />} />
 
-      {/* 5. Conditionally Render the Coupon Component as an Overlay */}
-      {isCouponVisible && <Coupon onClose={closeCoupon} />}
+              <Route
+                path="/productPageClassic"
+                element={<ProductLayoutClassic />}
+              />
+              <Route
+                path="/productPageScrollFixed"
+                element={<ProductLayoutScrollFixed />}
+              />
+              <Route
+                path="/productPageLeftThumbs"
+                element={<ProductLayoutLeftThumbs />}
+              />
+              <Route
+                path="/productPageRightThumbs"
+                element={<ProductLayoutRightThumbs />}
+              />
+              <Route
+                path="/productPageWithoutThumbs"
+                element={<ProductLayoutWithoutThumbs />}
+              />
+              <Route path="/typeWithVideo" element={<TypeWithVideo />} />
+              <Route
+                path="/product/:productId"
+                element={<ProductDetailPage />}
+              />
+              <Route path="/blog/grid" element={<BlogPage />} />
+              <Route path="/blog/standard" element={<BlogPageList />} />
+              <Route
+                path="/blog/post/:postId"
+                element={
+                  <BlogPostDetailWithSidebar
+                    onSearchClick={() => console.log("Search clicked")}
+                  />
+                }
+              />
+              <Route path="/about" element={<AboutSection />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/our-team" element={<MeetOurTeam />} />
+              <Route path="/PageNotFound" element={<NotFoundPage />} />
+              <Route path="/LookBook" element={<LookBook />} />
+              <Route path="/FAQ" element={<FAQPage />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/compare" element={<Compare />} />
+              <Route path="/*" element={<NotFoundPage />} />
+            </Routes>
 
-      {/* --- NEW RENDER --- */}
-      {/* 6. Conditionally Render the Upsell Modal */}
-      {isUpsellModalOpen && <UpsellModal onClose={closeUpsellModal} />}
-      {isCrossSellOpen && <CrossSell onClose={closeCrossSellModal} />}
+            {/* 💡 Only show these if we are NOT on a hidden route (Signup/Login) */}
+            {shouldShowLayout && (
+              <>
+                <RecentlyViewedSidebar />
+                <NewsletterSocials />
+                <Footer />
+              </>
+            )}
+          </div>
+
+          {isCouponVisible && <Coupon onClose={closeCoupon} />}
+          {isUpsellModalOpen && <UpsellModal onClose={closeUpsellModal} />}
+          {isCrossSellOpen && <CrossSell onClose={closeCrossSellModal} />}
+        </CompareProvider>
+      </WishlistProvider>
     </>
   );
 };

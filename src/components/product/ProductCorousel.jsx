@@ -101,11 +101,13 @@ const ProductCarousel = ({
         <Slider {...sliderSettings}>
           {products.map((product) => (
             <div key={product.id} className="p-2">
-              <ProductCard
-                product={product}
-                onViewProduct={onViewProduct}
-                onQuickView={onQuickView}
-              />
+              <div className="max-w-[280px] mx-auto">
+                <ProductCard
+                  product={product}
+                  onViewProduct={onViewProduct}
+                  onQuickView={onQuickView}
+                />
+              </div>
             </div>
           ))}
         </Slider>

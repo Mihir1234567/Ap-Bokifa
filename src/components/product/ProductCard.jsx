@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCurrency } from "../../context/CurrencyContext";
+import { useWishlist } from "../../context/WishlistContext";
+import { useCompare } from "../../context/CompareContext";
 import QuickViewDrawer from "../QuickViewDrawer";
+import { Repeat } from "lucide-react";
 
 // --- Currency Utility ---
 const CONVERSION_RATES = {
@@ -64,7 +67,10 @@ const ProductCard = ({
   onQuickView,
   variant = "default",
 }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const isWishlisted = isInWishlist(product.id);
+  const { toggleCompare, isInCompare } = useCompare();
+  const isCompared = isInCompare(product.id);
   const navigate = useNavigate();
   const { currency } = useCurrency();
   const [activeProduct, setActiveProduct] = useState(null);
@@ -103,7 +109,6 @@ const ProductCard = ({
             alt={product.title}
             className="w-full aspect-[2/3] object-cover transition-transform duration-300 rounded-t-xl"
           />
-
           {hasDiscount && (
             <div
               className={`absolute top-2 left-2 bg-red-600 text-white font-bold rounded-full flex items-center justify-center z-10 ${
@@ -115,7 +120,6 @@ const ProductCard = ({
               </span>
             </div>
           )}
-
           {product.isSoldOut && (
             <div
               className={`absolute top-2 left-2 bg-gray-600 text-white font-bold rounded-full flex items-center justify-center z-10 ${
@@ -131,7 +135,6 @@ const ProductCard = ({
               </span>
             </div>
           )}
-
           {!isSmall && (
             <StarRating
               rating={product.rating}
@@ -139,12 +142,11 @@ const ProductCard = ({
               variant={variant}
             />
           )}
-
           <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-10 transition-opacity duration-300">
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                setIsWishlisted(!isWishlisted);
+                toggleWishlist(product);
               }}
               className={`rounded-full hover:bg-gray-100 transition-colors shadow-md ${
                 isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
@@ -204,22 +206,22 @@ const ProductCard = ({
                 className={`group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
                   isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
                 }`}
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleCompare(product);
+                }}
               >
                 <span className="absolute right-full top-1/2 transform -translate-y-1/2 mr-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 transition-opacity duration-300 group-hover/icon:opacity-100 whitespace-nowrap z-50 pointer-events-none">
-                  Add to compare
+                  {isCompared ? "Remove compare" : "Add to compare"}
                 </span>
-                <img
-                  src="/src/assets/compare.svg"
-                  alt="compare"
-                  className={isSmall ? "h-3.5" : "h-5"}
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                  }}
+                <Repeat
+                  className={`${isSmall ? "w-3.5 h-3.5" : "w-5 h-5"} ${
+                    isCompared ? "text-red-500" : "text-gray-900"
+                  }`}
                 />
               </button>
             </div>
-          </div>
+          </div>{" "}
         </div>
 
         <div

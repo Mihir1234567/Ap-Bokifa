@@ -1,7 +1,7 @@
 /* d:/Projects/Ap-Bokifa-main/src/components/Navbar.jsx */
 // components/Navbar.jsx
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   ChevronLeftIcon,
@@ -14,10 +14,10 @@ import { Link } from "react-router-dom";
 
 // --- Custom Hook to detect screen size ---
 const useIsDesktop = () => {
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1280); // 1280px is Tailwind's xl breakpoint
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024); // 1024px is Tailwind's lg breakpoint
 
   useEffect(() => {
-    const handleResize = () => setIsDesktop(window.innerWidth >= 1280);
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -94,8 +94,14 @@ const CartIcon = () => (
   </svg>
 );
 
-// UPDATED: Replaced chevron with a text character for smaller size
-const ChevronDownIcon = () => <span className="ml-1 text-xs">▼</span>;
+// UPDATED: Replaced chevron with custom image
+const ChevronDownIcon = () => (
+  <img
+    src="/src/assets/DownDropdownArrow.png"
+    alt="v"
+    className="ml-1 w-3 h-3 object-contain mt-0.5"
+  />
+);
 
 // --- Dropdown (Click-based) ---
 const Dropdown = ({ selected, items, onSelect, buttonClass, menuClass }) => {
@@ -299,7 +305,7 @@ const NavDropdown = ({ title, items, menuClass, buttonClass = "" }) => {
     >
       <button
         ref={buttonRef} // <-- NEW: Add the buttonRef here
-        className={`flex items-center py-4 text-gray-800 font-medium hover:text-[#3AB757] ${buttonClass}`}
+        className={`flex items-center justify-center py-4 text-gray-800 font-medium hover:text-[#3AB757] ${buttonClass}`}
       >
         {title} <ChevronDownIcon />
       </button>
@@ -525,105 +531,414 @@ const MobileNavItem = ({ title, items }) => {
 // --- END MobileNavItem UPDATE ---
 
 // --- SearchDrawer Component - FIXED ---
-const SearchDrawer = ({ onClose }) => {
+// --- SearchDrawer Component - FIXED ---
+const SearchDrawer = ({ isOpen, onClose, products }) => {
   const isDesktop = useIsDesktop();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("PRODUCTS");
+
+  // Filter Logic
+  const filteredProducts = products.filter(
+    (product) =>
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.author.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const filteredArticles = blogData.filter((article) =>
+    article.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Define pages locally or pass as prop. Since they are static in Navbar, we can redefine or move them out.
+  // For now, I'll redefine the simple list here to avoid prop drilling complexity if they aren't changing.
+  const pagesItems = [
+    { title: "About Us", path: "/about" },
+    { title: "Contact", path: "/contact" },
+    { title: "Our Team", path: "/our-team" },
+    { title: "FAQs", path: "/FAQ" },
+    { title: "LookBook", path: "/lookbook" },
+    { title: "404", path: "/PageNotFound" },
+  ];
+
+  const filteredPages = pagesItems.filter((page) =>
+    page.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Collections - Mixed static and dynamic
+  // 1. Calculate category images
+  const categoryImages = useMemo(() => {
+    const map = {};
+    products.forEach((p) => {
+      if (!map[p.category] && p.imageUrl) {
+        map[p.category] = p.imageUrl;
+      }
+    });
+    return map;
+  }, [products]);
+
+  const uniqueCategories = [...new Set(products.map((p) => p.category))].sort();
+
+  const collectionItems = [
+    {
+      title: "Shop Left Sidebar",
+      path: "/AllProducts",
+      image: products[0]?.imageUrl,
+    },
+    {
+      title: "Collection Top",
+      path: "/collections/books",
+      image: products[1]?.imageUrl,
+    },
+    {
+      title: "List Collection",
+      path: "/collections/categories",
+      image: products[2]?.imageUrl,
+    },
+    ...uniqueCategories.map((category) => ({
+      title: category,
+      path: `/allproducts?category=${encodeURIComponent(category)}`,
+      image: categoryImages[category],
+    })),
+  ];
+
+  const filteredCollections = collectionItems.filter((collection) =>
+    collection.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Tab Content Renderer
+  const renderTabContent = () => {
+    if (!searchQuery) {
+      return (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ duration: 0.2 }}
+          className="mt-6"
+        >
+          <h3 className="font-bold text-xs text-gray-400 mb-4 uppercase tracking-widest border-b border-gray-100 pb-2">
+            Popular Searches
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            {[
+              { to: "/collections/categories", label: "All Collections" },
+              { to: "/AllProducts", label: "All Products" },
+              { to: "/contact", label: "Contact" },
+              { to: "/blog/standard", label: "Blog" },
+            ].map((link) => (
+              <Link
+                key={link.label}
+                to={link.to}
+                className="px-5 py-2.5 bg-gray-50 rounded-full text-sm font-medium text-gray-700 hover:bg-[#1D4A34] hover:text-white hover:shadow-md transition-all duration-300"
+                onClick={onClose}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        </motion.div>
+      );
+    }
+
+    const contentVariants = {
+      hidden: { opacity: 0, y: 10 },
+      visible: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+      exit: { opacity: 0, y: -10, transition: { duration: 0.1 } },
+    };
+
+    switch (activeTab) {
+      case "PRODUCTS":
+        return (
+          <motion.div
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="flex flex-col gap-2 mt-4"
+          >
+            {filteredProducts.length > 0 ? (
+              filteredProducts.map((product) => (
+                <Link
+                  to={`/product/${product.id}`}
+                  key={product.id}
+                  onClick={onClose}
+                  className="flex gap-4 group p-3 rounded-xl hover:bg-gray-50 transition-all duration-300 border border-transparent hover:border-gray-100"
+                >
+                  <div className="w-16 h-20 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 relative">
+                    <img
+                      src={product.imageUrl}
+                      alt={product.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center flex-grow">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-[#1D4A34] line-clamp-2 text-sm leading-snug transition-colors">
+                      {product.title}
+                    </h4>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <span className="text-[#1D4A34] font-bold text-sm">
+                        ${product.price}
+                      </span>
+                      {product.isSoldOut && (
+                        <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full tracking-wide">
+                          SOLD OUT
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                <SearchIcon className="w-12 h-12 mb-3 opacity-20" />
+                <p className="text-sm font-medium">No products found</p>
+              </div>
+            )}
+          </motion.div>
+        );
+      case "ARTICLE":
+        return (
+          <motion.div
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="flex flex-col gap-2 mt-4"
+          >
+            {filteredArticles.length > 0 ? (
+              filteredArticles.map((article) => (
+                <Link
+                  to={`/blog/post/${article.id}`}
+                  key={article.id}
+                  onClick={onClose}
+                  className="flex gap-4 group p-3 rounded-xl hover:bg-gray-50 transition-all duration-300 border border-transparent hover:border-gray-100"
+                >
+                  <div className="w-24 h-16 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100">
+                    <img
+                      src={article.image}
+                      alt={article.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center flex-grow">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-[#1D4A34] line-clamp-2 text-sm leading-snug transition-colors">
+                      {article.title}
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-1 font-medium uppercase tracking-wide group-hover:text-[#1D4A34] transition-colors">
+                      Read Article
+                    </p>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                <p className="text-sm font-medium">No articles found</p>
+              </div>
+            )}
+          </motion.div>
+        );
+      case "PAGES":
+        return (
+          <motion.div
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="flex flex-col gap-1 mt-4"
+          >
+            {filteredPages.length > 0 ? (
+              filteredPages.map((page) => (
+                <Link
+                  to={page.path}
+                  key={page.title}
+                  onClick={onClose}
+                  className="flex items-center justify-between p-4 rounded-xl hover:bg-gray-50 text-gray-700 hover:text-[#1D4A34] transition-all duration-200 group"
+                >
+                  <span className="font-semibold text-sm">{page.title}</span>
+                  <ChevronRightIcon className="w-4 h-4 text-gray-300 group-hover:text-[#1D4A34] transition-colors" />
+                </Link>
+              ))
+            ) : (
+              <div className="text-center py-12 text-gray-400">
+                <p className="text-sm font-medium">No pages found</p>
+              </div>
+            )}
+          </motion.div>
+        );
+      case "COLLECTIONS":
+        return (
+          <motion.div
+            variants={contentVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="grid grid-cols-2 gap-4 mt-4"
+          >
+            {filteredCollections.length > 0 ? (
+              filteredCollections.map((collection) => (
+                <Link
+                  to={collection.path}
+                  key={collection.title}
+                  onClick={onClose}
+                  className="group relative flex flex-col overflow-hidden rounded-xl border border-gray-100 hover:border-[#1D4A34] hover:shadow-md transition-all duration-300"
+                >
+                  <div className="aspect-[4/3] bg-gray-100 overflow-hidden relative">
+                    {collection.image ? (
+                      <>
+                        <img
+                          src={collection.image}
+                          alt={collection.title}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gray-50 text-gray-300">
+                        <span className="text-xs font-medium">No Image</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3 bg-white text-center">
+                    <h4 className="text-sm font-bold text-gray-800 group-hover:text-[#1D4A34] truncate transition-colors">
+                      {collection.title}
+                    </h4>
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="col-span-2 text-center py-12 text-gray-400">
+                <p className="text-sm font-medium">No collections found</p>
+              </div>
+            )}
+          </motion.div>
+        );
+      default:
+        return null;
+    }
+  };
 
   return (
-    <>
-      <motion.div
-        initial={{ x: isDesktop ? "-100%" : "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: isDesktop ? "-100%" : "100%" }}
-        // ANIMATION FIX: Uses fast tween
-        transition={{ type: "tween", duration: 0.25 }}
-        // Z-INDEX FIX: Changed z-[10000] to z-50
-        className="fixed top-0 h-full bg-white shadow-lg z-50 w-96 max-w-full p-6 flex flex-col right-0 xl:left-0"
-      >
-        <div className="flex justify-between items-center pb-4 border-b">
-          <div className="relative flex-grow">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-              <SearchIcon />
-            </span>
-            <input
-              type="text"
-              placeholder="Search our store..."
-              autoFocus
-              className="w-full pl-10 pr-3 py-2 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-[#3AB757]"
-            />
-          </div>
-          <button
-            onClick={onClose}
-            className="ml-4 text-gray-500 hover:text-gray-800"
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          <motion.div
+            initial={{ x: isDesktop ? "-100%" : "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: isDesktop ? "-100%" : "100%" }}
+            transition={{ type: "tween", duration: 0.25 }}
+            className="fixed top-0 h-full bg-white shadow-lg z-50 w-[500px] max-w-full flex flex-col right-0 lg:left-0"
           >
-            <XMarkIcon className="h-6 w-6" />
-          </button>
-        </div>
-        <div className="mt-6 flex flex-col gap-6">
-          <div>
-            <h3 className="font-bold text-sm text-gray-500 mb-3 uppercase tracking-wider">
-              Popular
-            </h3>
-            <div className="flex flex-col gap-2">
-              <Link // Use Link
-                to="/collection"
-                className="text-gray-700 hover:text-[#3AB757]"
-              >
-                All Collection
-              </Link>
-              <Link // Use Link
-                to="/products"
-                className="text-gray-700 hover:text-[#3AB757]"
-              >
-                All Product
-              </Link>
-              <Link // Use Link
-                to="/contact"
-                className="text-gray-700 hover:text-[#3AB757]"
-              >
-                Contact
-              </Link>
-              <Link // Use Link
-                to="/blog"
-                className="text-gray-700 hover:text-[#3AB757]"
-              >
-                Blog
-              </Link>
+            <div className="p-6 pb-2">
+              <div className="flex justify-between items-center pb-4 border-b border-gray-100 relative">
+                <div className="relative flex-grow">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-gray-400">
+                    <SearchIcon />
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="Search our store..."
+                    autoFocus
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        window.location.href = `/search?q=${searchQuery}`;
+                        onClose();
+                      }
+                    }}
+                    className="w-full pl-10 pr-4 py-3 text-gray-900 bg-transparent border-none focus:outline-none placeholder-gray-400 text-xl font-medium"
+                  />
+                </div>
+                <button
+                  onClick={onClose}
+                  className="ml-4 p-2 rounded-full hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <XMarkIcon className="h-6 w-6" />
+                </button>
+              </div>
             </div>
-          </div>
-          <div>
-            <h3 className="font-bold text-sm text-gray-500 mb-3 uppercase tracking-wider">
-              Information
-            </h3>
-            <div className="flex flex-col gap-2">
-              <Link // Use Link
-                to="/contact"
-                className="text-gray-700 hover:text-[#3AB757]"
-              >
-                Contact
-              </Link>
+
+            {/* Tabs */}
+            {searchQuery && (
+              <div className="px-6">
+                <div className="flex items-center gap-8 py-3 border-b border-gray-100 overflow-x-auto scrollbar-hide">
+                  {["PRODUCTS", "ARTICLE", "PAGES", "COLLECTIONS"].map(
+                    (tab) => (
+                      <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`text-xs font-bold uppercase tracking-widest whitespace-nowrap pb-3 border-b-2 transition-all duration-300 ${
+                          activeTab === tab
+                            ? "text-[#1D4A34] border-[#1D4A34]"
+                            : "text-gray-400 border-transparent hover:text-gray-600"
+                        }`}
+                      >
+                        {tab}
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            <div className="flex-1 overflow-y-auto p-6 pt-2">
+              {renderTabContent()}
             </div>
-          </div>
-        </div>
-      </motion.div>
-      {/* Z-INDEX FIX: Changed z-[90] to z-40 */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 backdrop-filter bg-black/75 z-40 transform"
-        onClick={onClose}
-      />
-    </>
+
+            {/* Fixed Footer for View All Button */}
+            {searchQuery && (
+              <div className="p-6 border-t border-gray-100 bg-white">
+                {activeTab === "PRODUCTS" && filteredProducts.length > 0 && (
+                  <Link
+                    to={`/search?q=${searchQuery}`}
+                    onClick={onClose}
+                    className="block w-full bg-[#1D4A34] text-white py-3.5 rounded-xl text-center font-semibold text-sm hover:bg-[#153827] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    View All Results ({filteredProducts.length})
+                  </Link>
+                )}
+                {activeTab === "ARTICLE" && filteredArticles.length > 0 && (
+                  <Link
+                    to="/blog/standard"
+                    onClick={onClose}
+                    className="block w-full bg-[#1D4A34] text-white py-3.5 rounded-xl text-center font-semibold text-sm hover:bg-[#153827] hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                  >
+                    View All Articles
+                  </Link>
+                )}
+              </div>
+            )}
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 backdrop-filter bg-black/75 z-40 transform"
+            onClick={onClose}
+          />
+        </>
+      )}
+    </AnimatePresence>
   );
 };
 
 import { useCurrency } from "../context/CurrencyContext";
 import { useWishlist } from "../context/WishlistContext";
 import { useCompare } from "../context/CompareContext";
+import { useCart } from "../context/CartContext";
+import ALL_PRODUCTS from "./productsData";
+import { blogData } from "./BlogData";
+import CartDrawer from "./CartDrawer";
 
 // --- Navbar (Main Component) ---
 // 1. Accept the `onUpsellClick` prop
-const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
+const Navbar = ({
+  onUpsellClick,
+  onCrossSellClick,
+  onCouponClick,
+  isSearchOpen,
+  onSearchClose,
+  onSearchOpen,
+}) => {
   // --- State and Handlers ---
   const quotes = [
     "All books at least 50% off list prices every day",
@@ -633,7 +948,8 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isBannerOpen, setIsBannerOpen] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  // const [isSearchOpen, setIsSearchOpen] = useState(false); // Removed local state
 
   const nextQuote = () => setCurrentIndex((prev) => (prev + 1) % quotes.length);
   const prevQuote = () =>
@@ -643,6 +959,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
   const { currency, changeCurrency } = useCurrency();
   const { wishlist } = useWishlist();
   const { compareList } = useCompare();
+  const { getCartCount } = useCart();
   const [selectedLanguage, setSelectedLanguage] = useState("ENGLISH");
 
   const currencies = [
@@ -708,7 +1025,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
 
   const shopItems = {
     "Shop Layout": [
-      { title: "Shop Left Sidebar", path: "/leftSidebar" },
+      { title: "Shop Left Sidebar", path: "/AllProducts" },
       { title: "Collection Top", path: "/collections/books" },
       { title: "List Collection", path: "/collections/categories" },
       { title: "Coupon", onClick: (e) => onCouponClick(e) },
@@ -774,11 +1091,11 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
     <>
       {/* Top Banner (kept outside the sticky header so it scrolls away) */}
       {isBannerOpen && (
-        // MODIFIED: bg-[#1D4A34] changed to bg-[#09331a]
-        <div className="relative bg-[#09331a] text-white text-center py-2 px-4 md:px-8 h-8 flex items-center justify-center">
-          <div className="relative flex items-center justify-center w-full max-w-lg mx-auto px-8 py-4">
+        // MODIFIED: bg-[#1D4A34] changed to bg-[#09331a], removed fixed height h-8, added min-h
+        <div className="relative bg-[#09331a] text-white text-center py-2 px-4 md:px-8 min-h-[32px] flex items-center justify-center">
+          <div className="relative flex items-center justify-center w-full max-w-lg mx-auto px-8 py-1">
             <button
-              className="absolute left-0 top-1/2 -translate-y-1/2 hover:opacity-75 md:-left-8  xl:block"
+              className="absolute left-0 top-1/2 -translate-y-1/2 hover:opacity-75 md:-left-8 hidden md:block"
               onClick={prevQuote}
             >
               <ChevronLeftIcon className="w-6 h-6 text-white" />
@@ -791,13 +1108,13 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.3 }}
-                className="text-white font-medium text-center"
+                className="text-white font-medium text-center text-sm md:text-base leading-tight"
               >
                 {currentQuote}
               </motion.span>
             </AnimatePresence>
             <button
-              className="absolute right-0 top-1/2 -translate-y-1/2 hover:opacity-75 md:-right-8"
+              className="absolute right-0 top-1/2 -translate-y-1/2 hover:opacity-75 md:-right-8 hidden md:block"
               onClick={nextQuote}
             >
               <ChevronRightIcon className="w-6 h-6 text-white" />
@@ -814,7 +1131,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
             {/* LEFT COLUMN: Mobile icons OR Desktop Logo */}
             <div className="flex items-center gap-4">
               {/* Mobile Icons (Hamburger + Search) */}
-              <div className="flex items-center gap-4 xl:hidden">
+              <div className="flex items-center gap-4 lg:hidden">
                 <button
                   className="text-gray-600 hover:text-[#1D4A34]"
                   onClick={() => setIsMenuOpen(true)}
@@ -823,31 +1140,37 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
                 </button>
                 <button // Changed <a> to <button> for non-navigation action
                   className="text-gray-600 hover:text-[#1D4A34]"
-                  onClick={() => setIsSearchOpen(true)}
+                  onClick={onSearchOpen}
                 >
                   <SearchIcon />
                 </button>
               </div>
               {/* Desktop Logo */}
-              <div className="hidden xl:block flex-shrink-0">
+              <div className="hidden lg:block flex-shrink-0">
                 <Logo />
               </div>
             </div>
             {/* CENTER COLUMN: Mobile Logo OR Desktop Search Bar */}
-            <div className="xl:flex-grow xl:max-w-3xl">
+            <div className="lg:flex-grow lg:max-w-3xl">
               {/* Mobile Logo */}
-              <div className="xl:hidden flex-shrink-0">
+              <div className="lg:hidden flex-shrink-0">
                 <Logo />
               </div>
               {/* Desktop Search Bar - MODIFIED SECTION */}
-              <div className="hidden xl:flex w-full  rounded-full  overflow-hidden  shadow-md ">
+              <div className="hidden lg:flex w-full  rounded-full  overflow-hidden  shadow-md ">
                 <input
                   type="text"
                   placeholder="Search our store..."
                   // MODIFIED: Added padding, removed borders, adjusted background, and made it fully rounded-left
                   className="w-full  px-6 py-3  text-gray-700  bg-white   border-0   rounded-l-full   focus:outline-none  cursor-pointer"
-                  onFocus={() => setIsSearchOpen(true)}
-                  readOnly
+                  onFocus={onSearchOpen}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      window.location.href = `/search?q=${e.target.value}`;
+                      onSearchClose();
+                    }
+                  }}
+                  // readOnly // REMOVED readOnly to allow typing
                 />
                 <button className=" px-8   py-3  text-white bg-[#027a36]  rounded-full  hover:bg-[#1D4A34] flex items-center gap-2">
                   <SearchIcon />
@@ -858,7 +1181,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
             {/* RIGHT COLUMN: Dropdowns and Icons */}
             <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Currency/Language */}
-              <div className="flex items-center space-x-2 sm:space-x-4 text-sm text-gray-600">
+              <div className="hidden lg:flex items-center space-x-2 sm:space-x-4 text-sm text-gray-600">
                 <Dropdown
                   selected={currency}
                   items={currencies}
@@ -885,15 +1208,16 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
                   {wishlist.length}
                 </span>
               </Link>
-              <Link
-                to="/cart"
-                className="text-gray-600 hover:text-[#1D4A34] relative"
+              {/* Cart Icon - UPDATED to open Drawer */}
+              <button
+                onClick={() => setIsCartOpen(true)}
+                className="relative text-gray-600 hover:text-[#1D4A34] group"
               >
                 <CartIcon />
                 <span className="absolute -top-2 -right-2 bg-[#3AB757] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                  0
+                  {getCartCount()}
                 </span>
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -901,7 +1225,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
         {/* Bottom Navigation Links (Desktop) */}
         <div className="border-t border-gray-200">
           <div className="max-w-screen-2xl mx-auto px-8 flex justify-between items-center">
-            <nav className="hidden xl:flex space-x-8">
+            <nav className="hidden lg:flex space-x-8">
               {/* MODIFIED: Added buttonClass="!text-[#3AB757]" */}
               <NavDropdown
                 title="Home"
@@ -923,7 +1247,7 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
 
               {/* --- END NEW LINK --- */}
             </nav>
-            <div className="hidden xl:block text-gray-800">
+            <div className="hidden lg:block text-gray-800">
               <span>Need help? Call Us: </span>
               <a
                 href="tel:+84250088833"
@@ -969,30 +1293,17 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
 
                 {/* --- END NEW LINK (MOBILE) --- */}
 
-                <div className="pt-6 flex space-x-4 text-sm text-gray-600 border-t border-gray-200 mt-4">
-                  <Dropdown
-                    selected={currency}
-                    items={currencies}
-                    onSelect={changeCurrency}
-                    buttonClass="text-sm px-0"
-                    menuClass="w-32"
-                  />
-                  <Dropdown
-                    selected={selectedLanguage}
-                    items={languages}
-                    onSelect={setSelectedLanguage}
-                    buttonClass="text-sm px-0"
-                    menuClass="w-32"
-                  />
+                <div className="pt-6 border-t border-gray-200 mt-4 flex justify-center">
+                  <Logo />
                 </div>
               </div>
               <div className="p-4 border-t border-gray-200">
                 <Link // Use Link
-                  to="/account"
+                  to="/login"
                   className="flex items-center space-x-3 text-gray-800 hover:text-[#1D4A34] font-medium"
                 >
                   <UserIcon className="h-5 w-5" />
-                  <span>Account</span>
+                  <span>Login</span>
                 </Link>
               </div>
             </motion.div>
@@ -1009,11 +1320,14 @@ const Navbar = ({ onUpsellClick, onCrossSellClick, onCouponClick }) => {
       </AnimatePresence>
 
       {/* Search Drawer */}
-      <AnimatePresence>
-        {isSearchOpen && (
-          <SearchDrawer onClose={() => setIsSearchOpen(false)} />
-        )}
-      </AnimatePresence>
+      <SearchDrawer
+        isOpen={isSearchOpen}
+        onClose={onSearchClose}
+        products={ALL_PRODUCTS}
+      />
+
+      {/* Cart Drawer */}
+      <CartDrawer isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
 };

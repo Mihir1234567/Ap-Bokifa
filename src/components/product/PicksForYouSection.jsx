@@ -5,6 +5,7 @@ import ALL_PRODUCTS from "../productsData";
 import { useCurrency } from "../../context/CurrencyContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { useCompare } from "../../context/CompareContext";
+import { useCart } from "../../context/CartContext";
 
 // --- Currency Conversion Utility ---
 const CONVERSION_RATES = {
@@ -106,6 +107,7 @@ export const PicksForYouSection = ({
   const { currency } = useCurrency();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { toggleCompare, isInCompare } = useCompare();
+  const { addToCart } = useCart();
   const navigate = useNavigate(); // Hook for navigation
 
   const featuredBook = ALL_PRODUCTS.find((book) =>
@@ -177,32 +179,45 @@ export const PicksForYouSection = ({
             {/* Icon Bar */}
             <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-20">
               {/* Wishlist */}
-              <button
-                className="bg-white/80 rounded-full p-2 hover:bg-white transition-colors shadow-md"
-                onClick={(e) => {
-                  e.stopPropagation(); // Stop navigation
-                  toggleWishlist(featuredBook);
-                }}
-              >
-                <Heart
-                  size={20}
-                  fill={isWishlisted ? "currentColor" : "none"}
-                  className={isWishlisted ? "text-red-500" : "text-gray-700"}
-                />
-              </button>
+              <div className="relative flex items-center group/icon">
+                <button
+                  className="group bg-white/80 rounded-full p-2 hover:bg-white transition-colors shadow-md"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Stop navigation
+                    toggleWishlist(featuredBook);
+                  }}
+                >
+                  <Heart
+                    size={20}
+                    fill={isWishlisted ? "currentColor" : "none"}
+                    className={
+                      isWishlisted
+                        ? "text-red-500"
+                        : "text-gray-700 hover:text-green-700"
+                    }
+                  />
+                </button>
+                <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
+                  {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                </span>
+              </div>
 
               {/* Hover Icons */}
               <div className="flex flex-col items-center space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 {/* Quick View - FIX: Wire up onQuickView prop */}
                 <div className="relative flex items-center group/icon">
                   <button
-                    className="bg-white/80 rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
+                    className="group bg-white/80 rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
                     onClick={(e) => {
                       e.stopPropagation(); // Stop navigation
                       if (onQuickView) onQuickView(featuredBook); // Open Drawer
                     }}
                   >
-                    <Eye size={20} strokeWidth={2} />
+                    <Eye
+                      size={20}
+                      strokeWidth={2}
+                      className="hover:text-green-700"
+                    />
                   </button>
                   <span className="absolute right-full mr-3 px-3 py-1 bg-gray-800 text-white text-xs rounded-md whitespace-nowrap opacity-0 group-hover/icon:opacity-100 transition-opacity duration-200 pointer-events-none">
                     Quick View
@@ -211,7 +226,7 @@ export const PicksForYouSection = ({
 
                 <div className="relative flex items-center group/icon">
                   <button
-                    className="bg-white/80 rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
+                    className="group bg-white/80 rounded-full p-2 text-gray-700 hover:bg-white transition-colors shadow-md"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleCompare(featuredBook);
@@ -219,7 +234,9 @@ export const PicksForYouSection = ({
                   >
                     <Repeat
                       className={`${
-                        isCompared ? "text-red-500" : "text-gray-900"
+                        isCompared
+                          ? "text-red-500"
+                          : "text-gray-900 hover:text-green-700"
                       }`}
                       size={20}
                     />
@@ -263,7 +280,7 @@ export const PicksForYouSection = ({
               className="mt-4 flex items-center justify-center space-x-2 bg-green-700 text-white text-sm font-bold py-2.5 px-6 rounded-full hover:bg-green-800 transition-colors shadow-lg shadow-green-200/50 w-full sm:w-fit"
               onClick={(e) => {
                 e.stopPropagation();
-                // Logic to add to cart
+                addToCart(featuredBook);
               }}
             >
               <ShoppingCart size={20} strokeWidth={2.5} />

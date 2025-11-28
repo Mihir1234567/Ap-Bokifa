@@ -3,44 +3,85 @@ import { useNavigate } from "react-router-dom";
 import ALL_PRODUCTS from "../components/productsData";
 import CustomCarousel from "../components/product/CustomCarousel";
 import QuickViewDrawer from "../components/QuickViewDrawer";
+import { useCart } from "../context/CartContext";
+import { SHIPPING_DATA } from "../data/shippingData";
 
 const CartPage = () => {
   const navigate = useNavigate();
 
-  // Mock Cart Data
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 20,
-      title: "A Prayer For Owen Meany",
-      author: "JOHN IRVING",
-      format: "Hardcover",
-      price: 29.95,
-      quantity: 2,
-      image: "/src/assets/ERASURE.webp",
-    },
-    {
-      id: 4,
-      title: "One Hundred Years Of Solitude",
-      author: "GABRIEL GARCIA MARQUEZ",
-      format: "Hardcover",
-      price: 299.95,
-      quantity: 1,
-      image: "/src/assets/James.webp",
-    },
-  ]);
+  const { cart, removeFromCart, updateQuantity } = useCart();
 
   const [note, setNote] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
-  const [shippingCountry, setShippingCountry] = useState("Ireland");
-  const [shippingProvince, setShippingProvince] = useState("Carlow");
-  const [shippingZip, setShippingZip] = useState("380005");
+
+  // Shipping State
+  const [shippingCountry, setShippingCountry] = useState("");
+  const [shippingProvince, setShippingProvince] = useState("");
+  const [shippingZip, setShippingZip] = useState("");
+  const [zipError, setZipError] = useState("");
+  const [zipSuccess, setZipSuccess] = useState(false);
+  const [shippingCost, setShippingCost] = useState(0);
+
   const [quickViewProduct, setQuickViewProduct] = useState(null);
+
+  // Derived state for available provinces based on selected country
+  const availableStates = useMemo(() => {
+    const country = SHIPPING_DATA.countries.find(
+      (c) => c.code === shippingCountry
+    );
+    return country ? country.states : [];
+  }, [shippingCountry]);
+
+  const handleEstimateShipping = () => {
+    setZipError("");
+    setZipSuccess(false);
+    setShippingCost(0);
+
+    if (!shippingCountry) {
+      setZipError("Please select a country.");
+      return;
+    }
+    if (!shippingProvince) {
+      setZipError("Please select a province/state.");
+      return;
+    }
+    if (!shippingZip) {
+      setZipError("Please enter a zip code.");
+      return;
+    }
+
+    const country = SHIPPING_DATA.countries.find(
+      (c) => c.code === shippingCountry
+    );
+    const state = country?.states.find((s) => s.code === shippingProvince);
+
+    if (state) {
+      // Check if the entered zip code exists in the state's zipcodes array
+      // We'll do a case-insensitive check and trim whitespace
+      const isValid = state.zipcodes.some(
+        (z) =>
+          z.toLowerCase().replace(/\s/g, "") ===
+          shippingZip.toLowerCase().replace(/\s/g, "")
+      );
+
+      if (isValid) {
+        setZipSuccess(true);
+        setShippingCost(state.shippingRate || 0);
+      } else {
+        setZipError("Invalid zip code for the selected state.");
+      }
+    } else {
+      setZipError("Invalid state selection.");
+    }
+  };
 
   // Calculations
   const subtotal = useMemo(
-    () => cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0),
-    [cartItems]
+    () => cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
+    [cart]
   );
+
+  const total = subtotal + shippingCost;
 
   const freeShippingThreshold = 1000;
   const amountForFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
@@ -49,17 +90,13 @@ const CartPage = () => {
     (subtotal / freeShippingThreshold) * 100
   );
 
-  const handleQuantityChange = (id, delta) =>
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(0, item.quantity + delta) }
-          : item
-      )
-    );
+  const handleQuantityChange = (id, format, delta) => {
+    updateQuantity(id, format, delta);
+  };
 
-  const handleRemove = (id) =>
-    setCartItems((prev) => prev.filter((item) => item.id !== id));
+  const handleRemove = (id, format) => {
+    removeFromCart(id, format);
+  };
 
   const handleViewProduct = (product) => navigate(`/product/${product.id}`);
 
@@ -98,70 +135,80 @@ const CartPage = () => {
 
         {/* CART ITEMS */}
         <div className="space-y-10 border-b border-gray-200 pb-10 mb-10">
-          {cartItems.map((item) => (
-            <div
-              key={item.id}
-              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] items-center gap-6"
-            >
-              {/* PRODUCT INFO */}
-              <div className="flex gap-4">
-                <div className="w-24 h-32 sm:h-36 border rounded overflow-hidden bg-gray-50">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
+          {cart.length === 0 ? (
+            <p className="text-center text-gray-500">Your cart is empty.</p>
+          ) : (
+            cart.map((item) => (
+              <div
+                key={`${item.id}-${item.format}`}
+                className="grid grid-cols-1 md:grid-cols-[1fr_1fr_1fr] items-center gap-6"
+              >
+                {/* PRODUCT INFO */}
+                <div className="flex gap-4">
+                  <div className="w-24 h-32 sm:h-36 border rounded overflow-hidden bg-gray-50">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div>
+                    <h3 className="font-serif text-lg text-gray-900 leading-tight mb-1">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      Format: {item.format}
+                    </p>
+
+                    {/* REMOVE (desktop) */}
+                    <button
+                      onClick={() => handleRemove(item.id, item.format)}
+                      className="hidden md:block text-xs text-gray-400 underline mt-2 hover:text-red-500"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
 
-                <div>
-                  <h3 className="font-serif text-lg text-gray-900 leading-tight mb-1">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-gray-500">Format: {item.format}</p>
+                {/* QUANTITY CONTROL */}
+                <div className="flex flex-col items-center md:items-start">
+                  <div className="flex items-center border rounded px-3 py-1 bg-white">
+                    <button
+                      className="px-2"
+                      onClick={() =>
+                        handleQuantityChange(item.id, item.format, -1)
+                      }
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center">{item.quantity}</span>
+                    <button
+                      className="px-2"
+                      onClick={() =>
+                        handleQuantityChange(item.id, item.format, 1)
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
 
-                  {/* REMOVE (desktop) */}
+                  {/* REMOVE (mobile) */}
                   <button
-                    onClick={() => handleRemove(item.id)}
-                    className="hidden md:block text-xs text-gray-400 underline mt-2 hover:text-red-500"
+                    onClick={() => handleRemove(item.id, item.format)}
+                    className="md:hidden text-xs text-gray-400 underline mt-2"
                   >
                     Remove
                   </button>
                 </div>
-              </div>
 
-              {/* QUANTITY CONTROL */}
-              <div className="flex flex-col items-center md:items-start">
-                <div className="flex items-center border rounded px-3 py-1 bg-white">
-                  <button
-                    className="px-2"
-                    onClick={() => handleQuantityChange(item.id, -1)}
-                  >
-                    -
-                  </button>
-                  <span className="w-8 text-center">{item.quantity}</span>
-                  <button
-                    className="px-2"
-                    onClick={() => handleQuantityChange(item.id, 1)}
-                  >
-                    +
-                  </button>
+                {/* ITEM TOTAL */}
+                <div className="text-right font-medium text-[#3AB757] text-lg">
+                  ${(item.price * item.quantity).toFixed(2)}
                 </div>
-
-                {/* REMOVE (mobile) */}
-                <button
-                  onClick={() => handleRemove(item.id)}
-                  className="md:hidden text-xs text-gray-400 underline mt-2"
-                >
-                  Remove
-                </button>
               </div>
-
-              {/* ITEM TOTAL */}
-              <div className="text-right font-medium text-[#3AB757] text-lg">
-                ${(item.price * item.quantity).toFixed(2)}
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* NOTE + SHIPPING */}
@@ -190,12 +237,22 @@ const CartPage = () => {
                 </label>
                 <select
                   value={shippingCountry}
-                  onChange={(e) => setShippingCountry(e.target.value)}
+                  onChange={(e) => {
+                    setShippingCountry(e.target.value);
+                    setShippingProvince(""); // Reset province when country changes
+                    setShippingZip("");
+                    setZipError("");
+                    setZipSuccess(false);
+                    setShippingCost(0);
+                  }}
                   className="w-full border rounded px-3 py-2 text-sm"
                 >
-                  <option>Ireland</option>
-                  <option>USA</option>
-                  <option>UK</option>
+                  <option value="">Select Country</option>
+                  {SHIPPING_DATA.countries.map((country) => (
+                    <option key={country.code} value={country.code}>
+                      {country.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -205,11 +262,22 @@ const CartPage = () => {
                 </label>
                 <select
                   value={shippingProvince}
-                  onChange={(e) => setShippingProvince(e.target.value)}
+                  onChange={(e) => {
+                    setShippingProvince(e.target.value);
+                    setShippingZip("");
+                    setZipError("");
+                    setZipSuccess(false);
+                    setShippingCost(0);
+                  }}
                   className="w-full border rounded px-3 py-2 text-sm"
+                  disabled={!shippingCountry}
                 >
-                  <option>Carlow</option>
-                  <option>Dublin</option>
+                  <option value="">Select Province</option>
+                  {availableStates.map((state) => (
+                    <option key={state.code} value={state.code}>
+                      {state.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -220,30 +288,72 @@ const CartPage = () => {
                 <input
                   type="text"
                   value={shippingZip}
-                  onChange={(e) => setShippingZip(e.target.value)}
-                  className="w-full border rounded px-3 py-2 text-sm"
+                  onChange={(e) => {
+                    setShippingZip(e.target.value);
+                    setZipError("");
+                    setZipSuccess(false);
+                    setShippingCost(0);
+                  }}
+                  className={`w-full border rounded px-3 py-2 text-sm ${
+                    zipError ? "border-red-500 focus:ring-red-500" : ""
+                  }`}
+                  placeholder="Enter Zip Code"
                 />
               </div>
             </div>
 
             {/* ESTIMATE BUTTON */}
-            <button className="bg-[#1D4A34] text-white text-sm font-bold py-2 px-6 rounded-full">
+            <button
+              onClick={handleEstimateShipping}
+              className="bg-[#1D4A34] text-white text-sm font-bold py-2 px-6 rounded-full hover:bg-[#153626] transition-colors"
+            >
               Estimate
             </button>
+
+            {/* ERROR / SUCCESS MESSAGES */}
+            <div className="mt-4">
+              {zipError && (
+                <p className="text-sm text-red-500 font-medium">{zipError}</p>
+              )}
+              {zipSuccess && (
+                <div className="text-sm">
+                  <p className="text-green-600 font-medium">Valid Zip Code!</p>
+                  <p className="text-[#3AB757] font-bold">
+                    Shipping Rate: ${shippingCost.toFixed(2)}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* CHECKOUT BOX — NOW UNDER ESTIMATE */}
         <div className="bg-gray-50 p-6 sm:p-8 rounded-lg w-full mb-16">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-xl font-serif">Subtotal</span>
-            <span className="text-xl font-serif">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-lg font-serif">Subtotal</span>
+            <span className="text-lg font-serif">
               ${subtotal.toFixed(2)} USD
             </span>
           </div>
 
+          <div className="flex justify-between items-center mb-4 border-b border-gray-200 pb-4">
+            <span className="text-lg font-serif">Shipping</span>
+            <span className="text-lg font-serif">
+              {shippingCost > 0
+                ? `$${shippingCost.toFixed(2)} USD`
+                : "$0.00 USD"}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center mb-6">
+            <span className="text-xl font-bold font-serif">Total</span>
+            <span className="text-xl font-bold font-serif text-[#3AB757]">
+              ${total.toFixed(2)} USD
+            </span>
+          </div>
+
           <p className="text-sm text-gray-500 mb-6">
-            Taxes and shipping calculated at checkout
+            Taxes calculated at checkout
           </p>
 
           <div className="flex items-start mb-6">

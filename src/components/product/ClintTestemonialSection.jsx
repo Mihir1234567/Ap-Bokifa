@@ -88,7 +88,7 @@ const ReviewCard = ({ review }) => (
             {/* Header (Name and Date) */}
             <div className="flex justify-between items-start mb-6 border-b border-gray-200 pb-4">
                 <div className="flex flex-col space-y-1">
-                    <p className="font-medium text-[gray-900] text-base">
+                    <p className="font-medium text-gray-900 text-base">
                         {review.name}
                     </p>
                     <StarRating rating={review.rating} />

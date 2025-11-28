@@ -15,7 +15,7 @@ const NotFoundPage = () => {
 
       {/* Continue Shopping Button */}
       <Link
-        to="/leftSidebar" // Update this path to your actual shop route
+        to="/allproducts" // Update this path to your actual shop route
         className="bg-[#008040] text-white px-8 py-3 rounded-full text-sm font-medium hover:bg-green-800 transition-colors duration-300"
       >
         Continue shopping

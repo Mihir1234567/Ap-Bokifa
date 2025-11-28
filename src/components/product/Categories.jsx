@@ -1,5 +1,6 @@
 import React from "react";
 import Slider from "react-slick";
+import { useNavigate } from "react-router-dom";
 
 // Import react-slick styles
 import "slick-carousel/slick/slick.css";
@@ -52,6 +53,7 @@ const CategoryItem = ({ name, imageUrl }) => (
 );
 
 export const Categories = () => {
+    const navigate = useNavigate();
     // UPDATED: Configuration settings for the react-slick carousel
     const sliderSettings = {
         dots: false,
@@ -87,45 +89,48 @@ export const Categories = () => {
     };
 
     return (
-        <section className="bg-[#f9f5f0] h-[450px]  font-serif p-8 md:p-12 overflow-hidden">
-            <div className="mx-auto">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-4xl md:text-6xl text-gray-700">
-                        Top categories
-                    </h2>
-                    <button className="text-[black] border border-gray-300 rounded-full px-5 py-2 text-m hover:bg-[black] hover:text-white transition-colors duration-500 flex-shrink-0">
-                        Browse All &rarr;
-                    </button>
-                </div>
+      <section className="bg-[#f9f5f0] h-[450px]  font-serif p-8 md:p-12 overflow-hidden">
+        <div className="mx-auto">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-4xl md:text-6xl text-gray-700">
+              Top categories
+            </h2>
+            <button
+              onClick={() => navigate(`/collections/categories`)}
+              className="text-[black] border border-gray-300 rounded-full px-5 py-2 text-m hover:bg-[black] hover:text-white transition-colors duration-500 flex-shrink-0"
+            >
+              Browse All &rarr;
+            </button>
+          </div>
 
-                {/* Desktop View: Grid (visible on screens > 1280px) */}
-                <div className="hidden xl:grid grid-cols-8 gap-5">
-                    {categories.map((category) => (
-                        <CategoryItem
-                            key={category.name}
-                            name={category.name}
-                            imageUrl={category.imageUrl}
-                        />
-                    ))}
-                </div>
+          {/* Desktop View: Grid (visible on screens > 1280px) */}
+          <div className="hidden xl:grid grid-cols-8 gap-5">
+            {categories.map((category) => (
+              <CategoryItem
+                key={category.name}
+                name={category.name}
+                imageUrl={category.imageUrl}
+              />
+            ))}
+          </div>
 
-                {/* Mobile & Tablet View: Carousel (visible on screens < 1280px) */}
-                <div className="xl:hidden">
-                    <Slider {...sliderSettings}>
-                        {categories.map((category) => (
-                            <div key={category.name} className="p-3">
-                                {" "}
-                                {/* Increased padding slightly */}
-                                <CategoryItem
-                                    name={category.name}
-                                    imageUrl={category.imageUrl}
-                                />
-                            </div>
-                        ))}
-                    </Slider>
+          {/* Mobile & Tablet View: Carousel (visible on screens < 1280px) */}
+          <div className="xl:hidden">
+            <Slider {...sliderSettings}>
+              {categories.map((category) => (
+                <div key={category.name} className="p-3">
+                  {" "}
+                  {/* Increased padding slightly */}
+                  <CategoryItem
+                    name={category.name}
+                    imageUrl={category.imageUrl}
+                  />
                 </div>
-            </div>
-        </section>
+              ))}
+            </Slider>
+          </div>
+        </div>
+      </section>
     );
 };

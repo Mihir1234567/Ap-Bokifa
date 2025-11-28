@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { X, Minus, Plus } from "lucide-react";
+import { X, Minus, Plus, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import { FORMAT_MULTIPLIERS } from "../constants";
 import { useCurrency } from "../context/CurrencyContext";
+import { useCart } from "../context/CartContext";
 
-// --- HELPER LOGIC ---
+// ... (helper functions remain unchanged)
 const CONVERSION_RATES = {
   "USD $": { rate: 1, symbol: "$" },
   "EUR €": { rate: 0.92, symbol: "€" },
@@ -61,16 +62,19 @@ const getPriceDetails = (product, selectedFormat, currency) => {
 const QuickViewDrawer = ({ isOpen, onClose, product }) => {
   const [cachedProduct, setCachedProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // FIX 1: Default to "Paperback" (Standard) instead of Hardcover
   const [selectedFormat, setSelectedFormat] = useState("Paperback");
   const { currency } = useCurrency();
+  const { addToCart } = useCart();
 
   // Update cache when a new product is passed
   useEffect(() => {
     if (product) {
       setCachedProduct(product);
       setQuantity(1);
+      setShowSuccess(false); // Reset success message on new product
 
       // FIX 2: Find the format that has a multiplier of 1 (Base Price)
       // This ensures the drawer opens with the same price shown on the card
@@ -98,12 +102,37 @@ const QuickViewDrawer = ({ isOpen, onClose, product }) => {
       />
 
       <div
-        className={`fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-in-out overflow-y-auto ${
-          isOpen ? "translate-x-0" : "translate-x-full"
+        className={`fixed top-0 right-0 h-full w-full md:w-[480px] bg-white z-50 transform transition-transform duration-500 ease-in-out overflow-y-auto ${
+          isOpen ? "translate-x-0 shadow-2xl" : "translate-x-full shadow-none"
         }`}
       >
         {activeProduct && (
           <>
+            {/* SUCCESS POPUP */}
+            {showSuccess && (
+              <div className="bg-[#3AB757] text-white px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-md">
+                <div className="flex items-center gap-2">
+                  <div className="bg-white rounded-full p-0.5">
+                    <Check
+                      size={14}
+                      className="text-[#3AB757]"
+                      strokeWidth={3}
+                    />
+                  </div>
+                  <span className="font-medium text-sm">
+                    Item added to your cart!
+                  </span>
+                </div>
+                <Link
+                  to="/cart"
+                  onClick={onClose}
+                  className="text-white underline text-sm font-medium hover:text-gray-100"
+                >
+                  View cart
+                </Link>
+              </div>
+            )}
+
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h2 className="text-xl font-serif text-slate-800">
                 Choose options
@@ -204,7 +233,13 @@ const QuickViewDrawer = ({ isOpen, onClose, product }) => {
               </div>
 
               <div className="space-y-3 pt-2">
-                <button className="w-full bg-[#027A36] hover:bg-black duration-500 text-white font-medium py-3.5 rounded-full transition-colors shadow-sm hover:shadow text-sm uppercase tracking-wide">
+                <button
+                  onClick={() => {
+                    addToCart(activeProduct, quantity, selectedFormat);
+                    setShowSuccess(true);
+                  }}
+                  className="w-full bg-[#027A36] hover:bg-black duration-500 text-white font-medium py-3.5 rounded-full transition-colors shadow-sm hover:shadow text-sm uppercase tracking-wide"
+                >
                   Add To Cart - {priceDetails?.formattedFinalPrice}
                 </button>
                 <button className="w-full bg-[#027A36] hover:bg-black duration-500 text-white font-medium py-3.5 rounded-full transition-colors shadow-sm hover:shadow text-sm uppercase tracking-wide">
@@ -215,6 +250,7 @@ const QuickViewDrawer = ({ isOpen, onClose, product }) => {
               <div className="text-center pt-2">
                 <Link
                   to={`/product/${activeProduct.id}`}
+                  onClick={onClose}
                   className="text-gray-500 hover:text-emerald-700 underline decoration-gray-300 hover:decoration-emerald-700 underline-offset-4 text-lg transition-all"
                 >
                   View details

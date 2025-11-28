@@ -378,7 +378,6 @@ const LookBook = () => {
                 <div key={product.id} className="px-2 pb-10">
                   <ProductCard
                     product={product}
-                    variant="small"
                     onQuickView={() => setActiveProduct(product)}
                     // Using default behavior of ProductCard which shows base price
                   />

@@ -25,6 +25,7 @@ import { ProductLayoutRightThumbs } from "./pages/ProductLayoutRightThumbs";
 import { ProductLayoutWithoutThumbs } from "./pages/ProductLayoutWithoutThumbs";
 import { TypeWithVideo } from "./pages/TypeWithVideo";
 import ProductDetailPage from "./pages/ProductDetailPage";
+import SearchResultsPage from "./pages/SearchResultsPage";
 
 import UpsellModal from "./components/UpsellModal";
 import CrossSell from "./components/CrossSell";
@@ -45,6 +46,8 @@ import Compare from "./pages/Compare";
 import { WishlistProvider } from "./context/WishlistContext";
 import { CompareProvider } from "./context/CompareContext";
 
+import { CartProvider } from "./context/CartContext";
+
 const App = () => {
   // 1. State to control the visibility of the coupon
   const [isCouponVisible, setIsCouponVisible] = useState(false);
@@ -52,6 +55,12 @@ const App = () => {
   // 2. Add new state for the upsell modal
   const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
   const [isCrossSellOpen, setIsCrossSellOpen] = useState(false);
+
+  // 3. Lifted Search State
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  const openSearch = () => setIsSearchOpen(true);
+  const closeSearch = () => setIsSearchOpen(false);
 
   // Get current location to detect route changes
   const location = useLocation();
@@ -63,7 +72,12 @@ const App = () => {
   // 💡 EFFECT TO BLOCK SCROLL
   useEffect(() => {
     const body = document.body;
-    if (isUpsellModalOpen || isCrossSellOpen || isCouponVisible) {
+    if (
+      isUpsellModalOpen ||
+      isCrossSellOpen ||
+      isCouponVisible ||
+      isSearchOpen
+    ) {
       body.style.overflow = "hidden";
     } else {
       body.style.overflow = "auto";
@@ -71,7 +85,7 @@ const App = () => {
     return () => {
       body.style.overflow = "auto";
     };
-  }, [isUpsellModalOpen, isCrossSellOpen, isCouponVisible]);
+  }, [isUpsellModalOpen, isCrossSellOpen, isCouponVisible, isSearchOpen]);
 
   const closeCoupon = () => {
     setIsCouponVisible(false);
@@ -102,93 +116,103 @@ const App = () => {
 
   return (
     <>
-      <WishlistProvider>
-        <CompareProvider>
-          <div className="flex flex-col min-h-screen">
-            <ScrollToTop />
+      <CartProvider>
+        <WishlistProvider>
+          <CompareProvider>
+            <div className="flex flex-col min-h-screen">
+              <ScrollToTop />
 
-            {/* 4. Only show Navbar if we are NOT on a hidden route */}
-            {shouldShowLayout && (
-              <Navbar
-                onUpsellClick={openUpsellModal}
-                onCrossSellClick={openCrossSellModal}
-                onCouponClick={showCouponManually}
-              />
-            )}
+              {/* 4. Only show Navbar if we are NOT on a hidden route */}
+              {shouldShowLayout && (
+                <Navbar
+                  onUpsellClick={openUpsellModal}
+                  onCrossSellClick={openCrossSellModal}
+                  onCouponClick={showCouponManually}
+                  isSearchOpen={isSearchOpen}
+                  onSearchClose={closeSearch}
+                  onSearchOpen={openSearch}
+                />
+              )}
 
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/leftSidebar" element={<BookstorePage />} />
-              <Route
-                path="/collections/categories"
-                element={<CategoryLanding />}
-              />
-              <Route path="/collections/books" element={<CollectionsBooks />} />
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/AllProducts" element={<BookstorePage />} />
+                <Route
+                  path="/collections/categories"
+                  element={<CategoryLanding />}
+                />
+                <Route
+                  path="/collections/books"
+                  element={<CollectionsBooks />}
+                />
 
-              <Route
-                path="/productPageClassic"
-                element={<ProductLayoutClassic />}
-              />
-              <Route
-                path="/productPageScrollFixed"
-                element={<ProductLayoutScrollFixed />}
-              />
-              <Route
-                path="/productPageLeftThumbs"
-                element={<ProductLayoutLeftThumbs />}
-              />
-              <Route
-                path="/productPageRightThumbs"
-                element={<ProductLayoutRightThumbs />}
-              />
-              <Route
-                path="/productPageWithoutThumbs"
-                element={<ProductLayoutWithoutThumbs />}
-              />
-              <Route path="/typeWithVideo" element={<TypeWithVideo />} />
-              <Route
-                path="/product/:productId"
-                element={<ProductDetailPage />}
-              />
-              <Route path="/blog/grid" element={<BlogPage />} />
-              <Route path="/blog/standard" element={<BlogPageList />} />
-              <Route
-                path="/blog/post/:postId"
-                element={
-                  <BlogPostDetailWithSidebar
-                    onSearchClick={() => console.log("Search clicked")}
-                  />
-                }
-              />
-              <Route path="/about" element={<AboutSection />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/our-team" element={<MeetOurTeam />} />
-              <Route path="/PageNotFound" element={<NotFoundPage />} />
-              <Route path="/LookBook" element={<LookBook />} />
-              <Route path="/FAQ" element={<FAQPage />} />
-              <Route path="/signup" element={<Signup />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/compare" element={<Compare />} />
-              <Route path="/*" element={<NotFoundPage />} />
-            </Routes>
+                <Route
+                  path="/productPageClassic"
+                  element={<ProductLayoutClassic />}
+                />
+                <Route
+                  path="/productPageScrollFixed"
+                  element={<ProductLayoutScrollFixed />}
+                />
+                <Route
+                  path="/productPageLeftThumbs"
+                  element={<ProductLayoutLeftThumbs />}
+                />
+                <Route
+                  path="/productPageRightThumbs"
+                  element={<ProductLayoutRightThumbs />}
+                />
+                <Route
+                  path="/productPageWithoutThumbs"
+                  element={<ProductLayoutWithoutThumbs />}
+                />
+                <Route path="/typeWithVideo" element={<TypeWithVideo />} />
+                <Route
+                  path="/product/:productId"
+                  element={<ProductDetailPage />}
+                />
+                <Route path="/search" element={<SearchResultsPage />} />
+                <Route path="/blog/grid" element={<BlogPage />} />
+                <Route
+                  path="/blog/standard"
+                  element={<BlogPageList onSearchClick={openSearch} />}
+                />
+                <Route
+                  path="/blog/post/:postId"
+                  element={
+                    <BlogPostDetailWithSidebar onSearchClick={openSearch} />
+                  }
+                />
+                <Route path="/about" element={<AboutSection />} />
+                <Route path="/contact" element={<ContactPage />} />
+                <Route path="/our-team" element={<MeetOurTeam />} />
+                <Route path="/PageNotFound" element={<NotFoundPage />} />
+                <Route path="/LookBook" element={<LookBook />} />
+                <Route path="/FAQ" element={<FAQPage />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/compare" element={<Compare />} />
+                <Route path="/*" element={<NotFoundPage />} />
+              </Routes>
 
-            {/* 💡 Only show these if we are NOT on a hidden route (Signup/Login) */}
-            {shouldShowLayout && (
-              <>
-                <RecentlyViewedSidebar />
-                <NewsletterSocials />
-                <Footer />
-              </>
-            )}
-          </div>
+              {/* 💡 Only show these if we are NOT on a hidden route (Signup/Login) */}
+              {shouldShowLayout && (
+                <>
+                  <RecentlyViewedSidebar />
+                  <NewsletterSocials />
+                  <Footer />
+                </>
+              )}
+            </div>
 
-          {isCouponVisible && <Coupon onClose={closeCoupon} />}
-          {isUpsellModalOpen && <UpsellModal onClose={closeUpsellModal} />}
-          {isCrossSellOpen && <CrossSell onClose={closeCrossSellModal} />}
-        </CompareProvider>
-      </WishlistProvider>
+            {isCouponVisible && <Coupon onClose={closeCoupon} />}
+            {isUpsellModalOpen && <UpsellModal onClose={closeUpsellModal} />}
+            {isCrossSellOpen && <CrossSell onClose={closeCrossSellModal} />}
+          </CompareProvider>
+        </WishlistProvider>
+      </CartProvider>
     </>
   );
 };

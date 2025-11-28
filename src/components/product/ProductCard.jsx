@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useCurrency } from "../../context/CurrencyContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { useCompare } from "../../context/CompareContext";
+import { useCart } from "../../context/CartContext";
 import QuickViewDrawer from "../QuickViewDrawer";
 import { Repeat } from "lucide-react";
 
@@ -71,6 +72,7 @@ const ProductCard = ({
   const isWishlisted = isInWishlist(product.id);
   const { toggleCompare, isInCompare } = useCompare();
   const isCompared = isInCompare(product.id);
+  const { addToCart } = useCart();
   const navigate = useNavigate();
   const { currency } = useCurrency();
   const [activeProduct, setActiveProduct] = useState(null);
@@ -143,36 +145,43 @@ const ProductCard = ({
             />
           )}
           <div className="absolute top-3 right-3 flex flex-col items-center space-y-2 z-10 transition-opacity duration-300">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleWishlist(product);
-              }}
-              className={`rounded-full hover:bg-gray-100 transition-colors shadow-md ${
-                isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
-              }`}
-            >
-              <svg
-                className={`${isSmall ? "w-3.5 h-3.5" : "w-5 h-5"} ${
-                  isWishlisted ? "text-red-500 fill-current" : "text-gray-900"
+            <div className="flex flex-col items-center space-y-2 group/icon relative">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleWishlist(product);
+                }}
+                className={`group rounded-full hover:bg-gray-100 transition-colors shadow-md ${
+                  isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
                 }`}
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
-                />
-              </svg>
-            </button>
+                <svg
+                  className={`${isSmall ? "w-3.5 h-3.5" : "w-5 h-5"} ${
+                    isWishlisted
+                      ? "text-red-500 fill-current"
+                      : "text-gray-900 hover:text-green-700"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
+                  />
+                </svg>
+              </button>
+              <span className="absolute right-full top-1/2 transform -translate-y-1/2 mr-2 px-2 py-1 bg-gray-700 text-white text-xs rounded opacity-0 transition-opacity duration-300 group-hover/icon:opacity-100 whitespace-nowrap z-50 pointer-events-none">
+                {isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+              </span>
+            </div>
 
             <div className="flex flex-col items-center space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <button
-                className={`group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
+                className={`group group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
                   isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
                 }`}
                 onClick={handleQuickViewClick}
@@ -183,7 +192,7 @@ const ProductCard = ({
                 <svg
                   className={`${
                     isSmall ? "w-3.5 h-3.5" : "w-5 h-5"
-                  } text-gray-700`}
+                  } text-gray-700 hover:text-green-700`}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -203,7 +212,7 @@ const ProductCard = ({
                 </svg>
               </button>
               <button
-                className={`group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
+                className={`group group/icon relative rounded-full hover:bg-gray-100 transition-colors shadow-md ${
                   isSmall ? "p-1.5 bg-white/80" : "p-2 bg-white"
                 }`}
                 onClick={(e) => {
@@ -216,7 +225,9 @@ const ProductCard = ({
                 </span>
                 <Repeat
                   className={`${isSmall ? "w-3.5 h-3.5" : "w-5 h-5"} ${
-                    isCompared ? "text-red-500" : "text-gray-900"
+                    isCompared
+                      ? "text-red-500"
+                      : "text-gray-900 hover:text-green-700"
                   }`}
                 />
               </button>
@@ -283,7 +294,10 @@ const ProductCard = ({
                     isSmall ? "py-1.5 text-xs" : "py-2.5 text-sm"
                   }`
             }
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart(product);
+            }}
             disabled={product.isSoldOut}
           >
             <svg

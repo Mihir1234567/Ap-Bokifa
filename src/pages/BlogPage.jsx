@@ -16,7 +16,7 @@ const Sidebar = ({ onSearchClick }) => {
           <input
             type="text"
             placeholder="Search..."
-            className="w-full border-b border-gray-300 pl-4 pr-10 py-3 text-sm focus:outline-none focus:border-b-green-600 transition-colors bg-transparent"
+            className="w-full border-b border-gray-300 pl-4 pr-10 py-3 text-sm text-gray-900 focus:outline-none focus:border-b-green-600 transition-colors bg-transparent"
             onFocus={onSearchClick}
             readOnly
           />
@@ -429,7 +429,7 @@ const BlogPostDetailWithSidebar = ({ onSearchClick }) => {
                       id="message"
                       name="message"
                       rows="5"
-                      className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                      className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                     ></textarea>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -444,7 +444,7 @@ const BlogPostDetailWithSidebar = ({ onSearchClick }) => {
                         type="text"
                         id="name"
                         name="name"
-                        className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                        className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                       />
                     </div>
                     <div>
@@ -458,7 +458,7 @@ const BlogPostDetailWithSidebar = ({ onSearchClick }) => {
                         type="email"
                         id="email"
                         name="email"
-                        className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
+                        className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent transition-all"
                       />
                     </div>
                   </div>

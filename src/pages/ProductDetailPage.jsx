@@ -1,6 +1,7 @@
 // ProductDetailPage.jsx
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { Repeat } from "lucide-react";
 import Slider from "react-slick";
 import ALL_PRODUCTS from "/src/components/productsData";
 import useRecentlyViewed from "/src/hooks/useRecentlyViwed";
@@ -8,9 +9,12 @@ import ProductCarousel from "/src/components/product/ProductCorousel";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import StickyBottomBar from "/src/components/product/StickyBottomBar";
 import CountdownTimer from "/src/components/product/CountdownTimer.jsx";
-import QuickViewDrawer from "/src/components/QuickViewDrawer"; // 1. IMPORT QUICK VIEW
+import QuickViewDrawer from "/src/components/QuickViewDrawer";
 import { FORMAT_MULTIPLIERS } from "/src/constants";
 import { useCurrency } from "/src/context/CurrencyContext";
+import { useCart } from "/src/context/CartContext";
+import { useWishlist } from "/src/context/WishlistContext";
+import { useCompare } from "/src/context/CompareContext";
 import {
   faFacebookF,
   faTwitter,
@@ -682,10 +686,13 @@ const ProductDetailPage = () => {
   const navigate = useNavigate();
   const { addRecentlyViewed } = useRecentlyViewed();
   const { currency } = useCurrency();
+  const { addToCart } = useCart();
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const { toggleCompare, isInCompare } = useCompare();
 
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedFormat, setSelectedFormat] = useState("Hardcover");
+  const [selectedFormat, setSelectedFormat] = useState("Paperback");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [enlargedImageUrl, setEnlargedImageUrl] = useState(null);
   const [qtyValue, setQtyValue] = useState(1);
@@ -730,13 +737,13 @@ const ProductDetailPage = () => {
   // 2. ADD STATE FOR QUICK VIEW PRODUCT
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
     const foundProduct = ALL_PRODUCTS.find((p) => p.id === parseInt(productId));
 
     if (foundProduct) {
       setProduct(foundProduct);
-      setSelectedFormat(foundProduct.format || "Hardcover");
+      setSelectedFormat("Paperback");
       setSelectedImageIndex(0);
       setEnlargedImageUrl(null);
       setActiveTab("Description");
@@ -868,6 +875,14 @@ useEffect(() => {
     window.location.reload();
   };
 
+  const handleWishlistClick = () => {
+    toggleWishlist(product);
+  };
+
+  const handleCompareClick = () => {
+    toggleCompare(product);
+  };
+
   const mainSliderSettings = {
     slidesToShow: 1,
     slidesToScroll: 1,
@@ -914,12 +929,13 @@ useEffect(() => {
         onFormatChange={handleFormatClick}
         priceDetails={currentPriceDetails}
         currency={currency}
+        onAddToCart={(qty) => addToCart(product, qty, selectedFormat)}
       />
 
       <Breadcrumbs />
 
       <div className="max-w-8xl mx-auto sm:px-6 lg:px-8 py-4">
-        <div className="flex max-w-7xl mx-auto flex-col lg:flex-col lg:flex-row gap-12 bg-white rounded-lg">
+        <div className="flex max-w-7xl mx-auto flex-col lg:flex-row gap-12 bg-white rounded-lg">
           <div className="lg:w-1/2 flex flex-col items-center">
             <div className="w-full max-w-full aspect-auto relative select-none">
               <Slider
@@ -1041,38 +1057,6 @@ useEffect(() => {
                 {product.description ||
                   `From the author of The Longest Ride and The Return comes a novel about the enduring legacy of first love, and the decisions that haunt us forever. 1996 was the year that changed everything for Maggie Dawes. Sent away at sixteen to live with an aunt she barely knew in Ocracoke, a remote village on North Carolina's Outer Banks, she could think only of the friends and family she left behind . . . until she met Bryce Trickett, one of the few teenagers on the island.`}
               </p>
-              <p>
-                Handsome, genuine, and newly admitted to West Point, Bryce
-                showed her how much there was to love about the wind-swept beach
-                town--and introduced her to photography, a passion that would
-                define the rest of her life. A collection of 10 well-researched
-                board books to introduce a wide range of learning topics and
-                everyday objects to the little scholars. The topics included in
-                the set are - ABC, Numbers, Shapes, Colours, Wild Animals, Farm
-                Animals and Pets, Birds, Fruits, Vegetables and Transport.
-              </p>
-              <div className="flex space-x-6 mt-6 text-sm text-gray-500">
-                <span className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900">
-                  <img src="/src/assets/tempo.svg" className="h-5 w-5" alt="" />
-                  Shipping & Returns
-                </span>
-                <span className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900">
-                  <img
-                    src="/src/assets/medal.svg"
-                    className="h-5 w-5 opacity-50"
-                    alt=""
-                  />
-                  Warranty
-                </span>
-                <span className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900">
-                  <img
-                    src="/src/assets/license.svg"
-                    className="h-5 w-5 opacity-50"
-                    alt=""
-                  />
-                  Secure Payment
-                </span>
-              </div>
             </div>
 
             <hr className="h-px my-3 bg-gray-200 border-0" />
@@ -1140,11 +1124,7 @@ useEffect(() => {
                 <div className="flex w-full max-w-lg space-x-4">
                   <button
                     className="flex-1 bg-green-700 text-white font-bold py-3 px-6 rounded-full hover:bg-green-600 transition-colors shadow-md text-lg"
-                    onClick={() =>
-                      console.log(
-                        `Added ${qtyValue} of "${product.title}" to cart`
-                      )
-                    }
+                    onClick={() => addToCart(product, qtyValue, selectedFormat)}
                   >
                     Add to Cart
                   </button>
@@ -1169,21 +1149,45 @@ useEffect(() => {
             </div>
 
             <div className="flex items-center justify-center space-x-6 text-sm mb-6 w-full">
-              <button className="flex  items-center text-gray-600 hover:text-gray-900">
-                <img
-                  src="/src/assets/heart.svg"
-                  className="w-4 h-4 opacity-100 mr-1"
-                  alt=""
-                />
-                Add To Wishlist
+              <button
+                onClick={handleWishlistClick}
+                className={`flex items-center transition-colors text-gray-600 hover:text-gray-900`}
+              >
+                <svg
+                  className={`w-4 h-4 mr-1 ${
+                    isInWishlist(product.id) ? "fill-current" : "fill-none"
+                  } ${
+                    isInWishlist(product.id)
+                      ? "text-red-600 hover:text-red-700"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 20.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
+                  />
+                </svg>
+                {isInWishlist(product.id)
+                  ? "Remove From Wishlist"
+                  : "Add To Wishlist"}
               </button>
-              <button className="flex items-center text-gray-600 hover:text-gray-900">
-                <img
-                  src="/src/assets/compare.svg"
-                  className="w-4 h-4 opacity-70 mr-1"
-                  alt=""
+              <button
+                onClick={handleCompareClick}
+                className={`flex items-center transition-colors text-gray-600 hover:text-gray-900`}
+              >
+                <Repeat
+                  className={`w-4 h-4 mr-1 ${
+                    isInCompare(product.id) ? "text-red-600" : "text-gray-600"
+                  }`}
                 />
-                Add To Compare
+                {isInCompare(product.id)
+                  ? "Remove From Compare"
+                  : "Add To Compare"}
               </button>
             </div>
             <hr className="h-px my-3 bg-gray-200 border-0" />
@@ -1271,43 +1275,6 @@ useEffect(() => {
                   {product.description ||
                     `From the author of The Longest Ride and The Return comes a novel about the enduring legacy of first love, and the decisions that haunt us forever. 1996 was the year that changed everything for Maggie Dawes. Sent away at sixteen to live with an aunt she barely knew in Ocracoke, a remote village on North Carolina's Outer Banks, she could think only of the friends and family she left behind . . . until she met Bryce Trickett, one of the few teenagers on the island.`}
                 </p>
-                <p>
-                  Handsome, genuine, and newly admitted to West Point, Bryce
-                  showed her how much there was to love about the wind-swept
-                  beach town--and introduced her to photography, a passion that
-                  would define the rest of her life. A collection of 10
-                  well-researched board books to introduce a wide range of
-                  learning topics and everyday objects to the little scholars.
-                  The topics included in the set are - ABC, Numbers, Shapes,
-                  Colours, Wild Animals, Farm Animals and Pets, Birds, Fruits,
-                  Vegetables and Transport.
-                </p>
-                <div className="flex space-x-6 mt-6 text-sm text-gray-500">
-                  <span className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900">
-                    <img
-                      src="/src/assets/tempo.svg"
-                      className="h-5 w-5"
-                      alt=""
-                    />
-                    Shipping & Returns
-                  </span>
-                  <span className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900">
-                    <img
-                      src="/src/assets/medal.svg"
-                      className="h-5 w-5 opacity-50"
-                      alt=""
-                    />
-                    Warranty
-                  </span>
-                  <span className="flex gap-2 items-center underline cursor-pointer hover:text-gray-900">
-                    <img
-                      src="/src/assets/license.svg"
-                      className="h-5 w-5 opacity-50"
-                      alt=""
-                    />
-                    Secure Payment
-                  </span>
-                </div>
               </div>
             )}
 

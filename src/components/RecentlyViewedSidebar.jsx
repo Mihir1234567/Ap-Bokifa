@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // NEW: Import motion and AnimatePresence
 import useRecentlyViewed from "../hooks/useRecentlyViwed";
+import { useNavigate } from "react-router-dom";
 
 // --- Component for a single product card inside the sidebar grid (Unchanged) ---
-const SidebarProductGridCard = ({ item }) => (
-    <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer">
+const SidebarProductGridCard = ({ item }) => {
+    const navigate = useNavigate();
+    return (
+    <div className="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer" onClick={() => navigate(`/product/${item.id}`)}>
         <div className="relative w-full aspect-[2/3] overflow-hidden">
             <img
                 src={item.imageUrl}
@@ -21,7 +24,8 @@ const SidebarProductGridCard = ({ item }) => (
             </p>
         </div>
     </div>
-);
+    );
+};
 
 // --- Main Sidebar Component (Rotation Logic MODIFIED) ---
 const RecentlyViewedSidebar = () => {

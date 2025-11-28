@@ -9,8 +9,8 @@ import ALL_PRODUCTS from "../components/productsData";
 const CategoryCard = ({ category }) => {
     // 🌟 FIX 1: Change destination path for all filtered categories to /leftSidebar
     const linkTo = category.isAllBooks
-        ? "/collections/books" // Special case: All Books links to the main collections page
-        : `/leftSidebar?category=${encodeURIComponent(category.name)}`; // All others link to the filtered bookstore page
+      ? "/collections/books" // Special case: All Books links to the main collections page
+      : `/allproducts?category=${encodeURIComponent(category.name)}`; // All others link to the filtered bookstore page
 
     return (
         <Link
